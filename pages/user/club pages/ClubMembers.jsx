@@ -5,7 +5,7 @@ import SubHeader from './SubHeader';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-const ClubMembers = () => {
+const ClubMember = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [members, setMembers] = useState([]);
