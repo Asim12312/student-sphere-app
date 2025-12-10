@@ -93,6 +93,9 @@ router.post('/createEvent', upload.single('image'), async (req, res) => {
         else {
             event.status = "pending";
         }
+        club.events.push(event._id);
+        await club.save();
+
         await event.save();
         return res.status(200).json({ message: 'Event sent for approval to admin' });
     }
@@ -101,5 +104,21 @@ router.post('/createEvent', upload.single('image'), async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
+router.get('/getEvents', async (req, res) => {
+    try {
+        const userEvents = req.query.events;
+        const events = await Event.findById(userEvents);
+        if (!events) {
+            return res.status(404).json({ message: 'Event not found' });
+        }
+        return res.status(200).json({ events });
+
+    }
+    catch (err) {
+        console.error("Error fetching events:", err.message);
+        res.status(500).json({ message: err.message });
+    }
+})
 
 module.exports = router;

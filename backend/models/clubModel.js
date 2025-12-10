@@ -29,9 +29,14 @@ const clubCreationSchema = new mongoose.Schema({
     ref: 'User',
     default: []
   },
-  posts:{
+  posts: {
     type: [mongoose.Schema.Types.ObjectId], // Optional: Reference actual post IDs
     ref: 'Post',
+    default: []
+  },
+  events: {
+    type: [mongoose.Schema.Types.ObjectId], // Optional: Reference actual post IDs
+    ref: 'Event',
     default: []
   }
 
