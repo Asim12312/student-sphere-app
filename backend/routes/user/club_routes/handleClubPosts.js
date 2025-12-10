@@ -7,6 +7,7 @@ const Club = require('../../../models/clubModel');
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { cloudinary } = require('../../../cloudinary/cloudinaryConfig');
+const authenticate = require('../../../middleware/jwtAuth');
 
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -20,9 +21,12 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', authenticate, upload.single('image'), async (req, res) => {
     try {
         const { description, clubId, userId, likes, comments } = req.body;
+
+        // Debug logs to diagnose membership check failures
+        console.log('CreatePost request body:', { description, clubId, userId, likes, comments });
 
         if (!clubId || !userId || !description) {
             return res.status(400).json({ message: 'Club ID, User ID, and description are required' });
@@ -30,12 +34,28 @@ router.post('/', upload.single('image'), async (req, res) => {
 
         const user = await User.findById(userId);
         const club = await Club.findById(clubId);
+
+        // Log fetched documents for debugging
+        console.log('Fetched user id:', user?._id?.toString());
+        console.log('Fetched club id:', club?._id?.toString());
+        console.log('Club members:', club?.members);
         if (!user || !club) {
             return res.status(404).json({ message: 'Club or User not found' });
         }
 
-        if (!club.members.includes(user._id)) {
-            return res.status(403).json({ message: 'You are not a club member' });
+        // Robust membership check: handle both ObjectId and string formats
+        const isMember = club.members.some(memberId => {
+            const memberIdStr = typeof memberId === 'string' ? memberId : memberId.toString();
+            const userIdStr = typeof userId === 'string' ? userId : userId.toString();
+            return memberIdStr === userIdStr;
+        });
+
+        const isCreator = club.createdBy.toString() === userId.toString();
+
+        console.log('Membership/Creator check:', { isMember, isCreator, userIdToCheck: userId });
+        if (!isMember && !isCreator) {
+            console.warn('Membership denied for user:', userId, 'clubMembers:', club.members, 'creator:', club.createdBy);
+            return res.status(403).json({ message: 'You are not a member of this club' });
         }
 
         // Cloudinary original file path
@@ -140,14 +160,14 @@ const reactionCooldown = new Map();
 const checkReactionCooldown = (req, res, next) => {
     const { userId } = req.body;
     const lastReaction = reactionCooldown.get(userId);
-    
+
     if (lastReaction && Date.now() - lastReaction < 2000) { // 2 second cooldown
-        return res.status(429).json({ 
+        return res.status(429).json({
             message: 'Please wait before reacting again',
             cooldown: 2000 - (Date.now() - lastReaction)
         });
     }
-    
+
     next();
 };
 
@@ -200,10 +220,10 @@ router.post('/likeUnlikePost', checkReactionCooldown, async (req, res) => {
         }
 
         await post.save();
-        
+
         // Update cooldown
         reactionCooldown.set(userId, Date.now());
-        
+
         // Clean up old entries (optional: prevent memory leak)
         setTimeout(() => reactionCooldown.delete(userId), 5000);
 
@@ -252,7 +272,7 @@ router.post('/getPostReactions', async (req, res) => {
         console.error('Error fetching post reactions:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
-})   
+})
 
 router.get('/feedPosts', async (req, res) => {
     try {

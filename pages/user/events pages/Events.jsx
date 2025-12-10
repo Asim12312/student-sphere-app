@@ -1,9 +1,15 @@
 import React, { useState } from 'react'
 import SideBar from '../../../components/user/SideBar'
 import { GiHamburgerMenu } from 'react-icons/gi'
+import axios from 'axios'
 
 const Events = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const userData = JSON.parse(localStorage.getItem("userData"));
+  const clubsJoined = userData?.joinedClubs;
+  useEffect(() => {
+
+  }, [])
   return (
     <>
       {/* Hamburger icon always visible when sidebar is closed */}

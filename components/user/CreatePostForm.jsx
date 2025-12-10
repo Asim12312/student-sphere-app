@@ -12,7 +12,7 @@ export default function CreatePostForm({ clubId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!description.trim()) {
       toast.error('Please enter a description');
       return;
@@ -35,23 +35,31 @@ export default function CreatePostForm({ clubId }) {
         formData.append('image', image);
       }
 
+      const authToken = userData?.token;
+
+      if (!authToken) {
+        toast.error('Session expired. Please login again.');
+        return;
+      }
+
       await axios.post('http://localhost:3000/post', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${authToken}`,
         },
       });
 
       toast.success('Post created successfully!');
-      
+
       // Reset form
       setDescription('');
       setImage(null);
-      
+
       // Refresh the page to show new posts
       window.location.reload();
     } catch (error) {
       console.error('Error creating post:', error);
-      toast.error('Failed to create post. Please try again.');
+      toast.error(error.response?.data?.message || 'Failed to create post. Please try again.');
     } finally {
       setLoading(false);
     }

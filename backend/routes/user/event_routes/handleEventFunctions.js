@@ -5,6 +5,8 @@ const Event = require('./../../../models/event');
 const multer = require("multer");
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { cloudinary } = require('../../../cloudinary/cloudinaryConfig');
+const Club = require('./../../../models/clubModel');
+const User = require('./../../../models/user');
 
 // Cloudinary storage config
 const storage = new CloudinaryStorage({
@@ -76,6 +78,21 @@ router.post('/createEvent', upload.single('image'), async (req, res) => {
             thumbnailURL
         });
 
+        const club = await Club.findById(clubId);
+        if (!club) {
+            return res.status(404).json({ message: 'Club not found' });
+        }
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        if (club.createdBy == userId) {
+            event.status = "approved";
+        }
+        else {
+            event.status = "pending";
+        }
         await event.save();
         return res.status(200).json({ message: 'Event sent for approval to admin' });
     }

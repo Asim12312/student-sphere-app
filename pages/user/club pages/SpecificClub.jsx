@@ -203,59 +203,69 @@ const SpecificClub = () => {
                     <span className="font-semibold">Description:</span> {club.description}
                   </p>
 
-            
 
-              <div className="flex flex-wrap gap-4 mb-6">
-                {isAdmin && (
-                  <>
+
+                  <div className="flex flex-wrap gap-4 mb-6">
+                    {isAdmin && (
+                      <>
+                        <button
+                          onClick={() => setEditClub(true)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow"
+                        >
+                          ✏️ Edit Club
+                        </button>
+                        <button
+                          onClick={() => navigate(`/createEvent/${id}`)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow"
+                        >
+                          Create Event
+                        </button>
+                        <button
+                          onClick={() => navigate(`/events/${id}`)}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow"
+                        >
+                          View Events
+                        </button>
+                        <button
+                          onClick={handleDelete}
+                          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow"
+                        >
+                          🗑️ Delete Club
+                        </button>
+                      </>
+                    )}
+
                     <button
-                      onClick={() => setEditClub(true)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow"
+                      onClick={() => navigate(`/club/${id}/members`)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow"
                     >
-                      ✏️ Edit Club
+                      👥 View All Members
                     </button>
 
-                    <button
-                      onClick={handleDelete}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md shadow"
-                    >
-                      🗑️ Delete Club
-                    </button>
-                  </>
-                )}
+                    {!isAdmin && (
+                      <div>
+                        <button
+                          onClick={handleJoinLeaveClub}
+                          disabled={joinLoading}
+                          className={`${isJoined ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
+                            } text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          {joinLoading ? "..." : isJoined ? "Leave" : "Join"}
+                        </button>
+                        <button
+                          onClick={() => navigate(`/createEvent/${id}`)}
+                          className='ml-5 mr-5 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed'>Create event</button>
+                        <button className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed'>View events</button>
+                      </div>
+                    )}
 
-                <button
-                  onClick={() => navigate(`/club/${id}/members`)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md shadow"
-                >
-                  👥 View All Members
-                </button>
+                  </div>
 
-                {!isAdmin && (
-                  <div>
-                  <button
-                    onClick={handleJoinLeaveClub}
-                    disabled={joinLoading}
-                    className={`${
-                      isJoined ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                    } text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    {joinLoading ? "..." : isJoined ? "Leave" : "Join"}
-                  </button>
-                  <button
-                  onClick={()=>navigate(`/createEvent/${club.clubId}`)}
-                  className='ml-5 mr-5 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed'>Create event</button>
-                  <button className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed'>View events</button>
-                 </div>
-                )}
-               
-              </div>
-
-              {/* Members Display Section */}
-              <div className="border-t pt-6 mt-6">
-                <h3 className="text-xl font-semibold mb-4 text-gray-800">Club Members</h3>
-                <ClubMembersPreview clubId={id} />
-              </div>
+                  {/* Members Display Section */}
+                  <div className="border-t pt-6 mt-6">
+                    <h3 className="text-xl font-semibold mb-4 text-gray-800">Club Members</h3>
+                    <ClubMembersPreview clubId={id} />
+                  </div>
                 </>
               )}
 
@@ -275,13 +285,15 @@ const SpecificClub = () => {
             <p className="text-center text-red-600 text-lg">Club not found.</p>
           )}
         </div>
-        
-        {/* Create Post Section */}
-        <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 mt-8">
-          <h3 className="text-xl font-semibold mb-4 text-gray-800">Create New Post</h3>
-          <CreatePostForm clubId={id} />
-        </div>
-        
+
+        {/* Create Post Section - Only visible if member or admin */}
+        {(isJoined || isAdmin) && (
+          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 mt-8">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Create New Post</h3>
+            <CreatePostForm clubId={id} />
+          </div>
+        )}
+
         <UserClubPosts clubId={id} />
       </div>
 

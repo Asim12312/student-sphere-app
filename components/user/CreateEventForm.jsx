@@ -42,7 +42,7 @@ const CreateEventForm = () => {
             return;
         }
 
-        if (!clubId || !isValidObjectId(clubId)) {
+        if (!clubId) {
             toast.error("Invalid club ID. Please navigate to this page from a valid club.");
             return;
         }
@@ -95,11 +95,6 @@ const CreateEventForm = () => {
             }
         } catch (err) {
             console.error("Upload error:", err);
-            if (err.response && err.response.status === 400) {
-                toast.error("Invalid data provided. Please check your inputs.");
-            } else {
-                toast.error("Error occurred during uploading");
-            }
         }
     };
 

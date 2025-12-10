@@ -25,7 +25,7 @@ router.get('/checkMembership/:userId/:clubId', async (req, res) => {
       });
     }
 
-    const isMember = club.members.includes(userId) && user.joinedClubs.includes(clubId);
+    const isMember = club.members.some(m => m.toString() === userId.toString()) && user.joinedClubs.some(c => c.toString() === clubId.toString());
 
     res.status(200).json({
       success: true,
@@ -70,7 +70,7 @@ router.post('/joinClub', async (req, res) => {
       });
     }
 
-    if (club.members.includes(userId)) {
+    if (club.members.some(m => m.toString() === userId.toString())) {
       return res.status(400).json({
         success: false,
         message: 'User already a member of this club'
@@ -118,7 +118,7 @@ router.post('/leaveClub', async (req, res) => {
       });
     }
 
-    if (!club.members.includes(userId) || !user.joinedClubs.includes(clubId)) {
+    if (!club.members.some(m => m.toString() === userId.toString()) || !user.joinedClubs.some(c => c.toString() === clubId.toString())) {
       return res.status(400).json({
         success: false,
         message: 'User is not a member of this club'
