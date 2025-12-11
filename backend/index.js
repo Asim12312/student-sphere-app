@@ -1,5 +1,5 @@
 require('dotenv').config();
-const express =  require('express')
+const express = require('express')
 const app = express();
 const db = require('./db');
 const cors = require('cors');
@@ -33,6 +33,8 @@ const handleClubRoutes = require('./routes/user/club_routes/handleClubRoutes');
 const handleClubMembers = require('./routes/user/club_routes/handleClubMembers')
 const handleClubPosts = require('./routes/user/club_routes/handleClubPosts')
 const eventFunctions = require('./routes/user/event_routes/handleEventFunctions')
+const notificationRoutes = require('./routes/user/notificationRoutes');
+const handleClubRequests = require('./routes/user/club_routes/handleClubRequests');
 
 app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
@@ -47,7 +49,9 @@ app.use('/club', handleClubRoutes);
 app.use('/handleMember', handleClubMembers)
 app.use('/post', handleClubPosts);
 app.use('/eventFunctions', eventFunctions);
-const PORT = 3000;
+app.use('/notifications', notificationRoutes);
+app.use('/clubRequest', handleClubRequests);
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

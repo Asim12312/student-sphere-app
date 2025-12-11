@@ -1,8 +1,7 @@
 import { useState } from "react";
-import SideBar from "../../components/user/SideBar";
+import Header from "../../components/Header";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
-import { GiHamburgerMenu } from 'react-icons/gi';
 
 const EditProfile = () => {
     const [userData, setUserData] = useState(() => {
@@ -24,7 +23,7 @@ const EditProfile = () => {
     }
 
     const [submit, setSubmit] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+
 
     const handleChange = (e) => {
         setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -55,30 +54,18 @@ const EditProfile = () => {
     };
 
     return (
-        <>
-            {/* Hamburger icon always visible when sidebar is closed */}
-            {!sidebarOpen && (
-                <button
-                    className="fixed top-4 left-4 z-50 text-3xl bg-white rounded-full p-2 shadow"
-                    onClick={() => setSidebarOpen(true)}
-                    aria-label="Open sidebar"
-                >
-                    <GiHamburgerMenu />
-                </button>
-            )}
-            <div className={`h-screen w-screen ${sidebarOpen ? "md:grid md:grid-cols-[1fr_5fr]" : ""}`}>
-                {sidebarOpen && (
-                    <SideBar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-                )}
-                <form onSubmit={handleSubmit} className="grid grid-rows-[1fr_2fr_3fr_3fr] p-4 overflow-y-auto">
-                    
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <Header message1="Edit Profile" message2="Update your personal information" />
+            <div className="flex-1 w-full max-w-4xl mx-auto px-4 py-8">
+                <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-8">
+
                     <div className="flex justify-end items-center mr-12 mt-5">
                         <button
                             type="submit"
                             disabled={!submit}
                             className={`${submit
-                                    ? "bg-red-700 cursor-pointer"
-                                    : "bg-red-300 cursor-not-allowed"
+                                ? "bg-red-700 cursor-pointer"
+                                : "bg-red-300 cursor-not-allowed"
                                 } text-white rounded-lg font-bold text-lg h-12 w-24`}
                         >
                             Save
@@ -143,13 +130,13 @@ const EditProfile = () => {
                             </select>
                         </div>
 
-                      
+
                     </div>
-                    
+
                 </form>
             </div>
             <ToastContainer position="top-right" autoClose={1000} />
-        </>
+        </div>
     );
 };
 

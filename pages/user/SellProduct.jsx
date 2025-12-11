@@ -1,5 +1,5 @@
 import Header from '../../components/Header'
-import SideBar from '../../components/user/SideBar'
+
 import { useState, useEffect } from 'react'
 import { toast, ToastContainer } from 'react-toastify';
 import axios from 'axios'
@@ -117,13 +117,9 @@ const SellProduct = () => {
                 </div>
             )}
 
-            <div className="h-screen w-screen grid grid-cols-[1fr_5fr]">
-                <div className="bg-white border-r border-gray-300">
-                    <SideBar />
-                </div>
-
-                <div className="overflow-y-auto">
-                    <Header message1="Sell product" message2="You can post product to sell by providing details below" />
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <Header message1="Sell product" message2="You can post product to sell by providing details below" />
+                <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-6 overflow-y-auto">
                     <form onSubmit={handleSubmit}>
                         <div className='grid grid-cols-2'>
                             <div className='grid grid-rows-10'>
@@ -298,7 +294,7 @@ const SellProduct = () => {
                         </div>
                     </form>
                 </div>
-                
+
             </div>
             <ToastContainer position="top-right" autoClose={2000} />
         </>

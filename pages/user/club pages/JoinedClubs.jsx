@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import SideBar from '../../../components/user/SideBar';
+import Header from '../../../components/Header';
 import SubHeader from './SubHeader';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { setJoinedMembers } from '../../../src/features/clubMembersSlice';
 const JoinedClubs = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  
+
   const userData = JSON.parse(localStorage.getItem('userData'));
   const userId = userData?.userId;
   const [clubMembersCount, setClubMembersCount] = useState(0);// Members count of each club
@@ -57,11 +57,13 @@ const JoinedClubs = () => {
   }, [userId]);
 
   return (
-    <>
-      <SideBar />
-      <SubHeader />
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header message1="Joined Clubs" message2="Clubs you are a member of" />
+      <div className="px-4">
+        <SubHeader />
+      </div>
 
-      <div className="min-h-screen px-4 md:px-10 py-10 bg-gray-50">
+      <div className="flex-1 px-4 md:px-10 py-10">
         <h1 className="text-3xl font-bold mb-6 text-gray-800">Clubs You've Joined</h1>
 
         {loading ? (
@@ -95,14 +97,15 @@ const JoinedClubs = () => {
                   >
                     View Club
                   </button>
-                <p>Total memebers: {club.members.length}</p>
+                  <p>Total memebers: {club.members.length}</p>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
-    </>
+    </div>
+
   );
 };
 

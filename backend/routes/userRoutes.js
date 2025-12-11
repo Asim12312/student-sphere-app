@@ -3,6 +3,7 @@ const router = express.Router();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./../models/user');
+const Club = require('./../models/clubModel');
 
 router.post('/signup', async (req, res) => {
   try {
@@ -102,11 +103,20 @@ router.get("/getUserClubs", async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
-    const clubs = user.joinedClubs;
-    if (!clubs) {
-      return res.status(404).json({ error: "Clubs not found" });
-    }
-    res.json(clubs);
+
+    // Get joined clubs (ensure it's an array)
+    const joinedClubs = Array.isArray(user.joinedClubs) ? user.joinedClubs : [];
+
+    // Get clubs created by the user
+    // We only need the _id field
+    const createdClubs = await Club.find({ createdBy: userId }).select('_id');
+    const createdClubIds = createdClubs.map(club => club._id.toString());
+
+    // Merge and deduplicate
+    // Convert joinedClubs to strings to ensure Set uniqueness works correctly with mixed types (String vs ObjectId)
+    const allClubIds = [...new Set([...joinedClubs.map(id => id.toString()), ...createdClubIds])];
+
+    res.json(allClubIds);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Internal server error" });

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import SideBar from "./SideBar";
+import Header from "../Header";
 import SubHeader from "../../pages/user/club pages/SubHeader";
 import axios from "axios";
 import { useParams } from "react-router-dom";
@@ -99,14 +99,16 @@ const CreateEventForm = () => {
     };
 
     return (
-        <>
-            <SideBar />
-            <SubHeader />
+        <div className="min-h-screen bg-gray-50 flex flex-col">
+            <Header message1="Create Event" message2="Host an event for your club" />
+            <div className="px-4">
+                <SubHeader />
+            </div>
 
-            <div className="flex justify-center items-center min-h-screen bg-gray-100 p-6">
+            <div className="flex-1 px-4 py-8 md:px-10">
                 <form
                     onSubmit={handleEventForm}
-                    className="w-full max-w-lg bg-white shadow-lg rounded-2xl p-8 space-y-5"
+                    className="w-full max-w-lg bg-white shadow-lg rounded-2xl p-8 space-y-5 mx-auto"
                 >
                     <h2 className="text-2xl font-bold text-gray-700 text-center mb-6">
                         Create Event
@@ -222,7 +224,7 @@ const CreateEventForm = () => {
                 </form>
             </div>
             <ToastContainer position="top-right" autoClose={1500} />
-        </>
+        </div>
     );
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import SideBar from '../../../components/user/SideBar';
+import Header from '../../../components/Header';
 import SubHeader from './SubHeader';
 import ClubMembersPreview from './ClubMembersPreview';
 import axios from 'axios';
@@ -103,27 +103,43 @@ const SpecificClub = () => {
         setIsJoined(false);
         toast.success("Left the club successfully!");
       } else {
-        await axios.post('http://localhost:3000/handleMember/joinClub', {
+        const res = await axios.post('http://localhost:3000/handleMember/joinClub', {
           userId,
           clubId: id,
         });
-        setIsJoined(true);
-        toast.success("Joined the club successfully!");
+
+        if (res.data.message === 'Join request sent successfully') {
+          toast.success("Join request sent!");
+          // Update club state to show request sent
+          setClub(prev => ({
+            ...prev,
+            joinRequests: [...(prev.joinRequests || []), { user: userId, status: 'pending' }]
+          }));
+        } else {
+          setIsJoined(true);
+          toast.success("Joined the club successfully!");
+        }
       }
     } catch (error) {
       console.error("Error joining/leaving club:", error);
-      toast.error("Something went wrong. Please try again.");
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(error.response.data.message)
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       setJoinLoading(false);
     }
   };
 
   return (
-    <>
-      <SideBar />
-      <SubHeader />
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header message1="Club Details" message2="View and manage club details" />
+      <div className="px-4">
+        <SubHeader />
+      </div>
 
-      <div className="min-h-screen bg-gray-100 px-4 py-10 md:px-10">
+      <div className="flex-1 px-4 py-10 md:px-10">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6">
           {loading ? (
             <p className="text-center text-gray-600 text-lg">Loading club details...</p>
@@ -246,11 +262,21 @@ const SpecificClub = () => {
                       <div>
                         <button
                           onClick={handleJoinLeaveClub}
-                          disabled={joinLoading}
-                          className={`${isJoined ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
-                            } text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed`}
+                          disabled={joinLoading || (!isJoined && club.joinRequests && club.joinRequests.some(r => r.user === userId && r.status === 'pending'))}
+                          className={`${isJoined
+                            ? "bg-red-500 hover:bg-red-600"
+                            : club.joinRequests && club.joinRequests.some(r => r.user === userId && r.status === 'pending')
+                              ? "bg-yellow-500 cursor-not-allowed"
+                              : "bg-green-500 hover:bg-green-600"
+                            } text-white px-4 py-2 rounded-md shadow disabled:opacity-50`}
                         >
-                          {joinLoading ? "..." : isJoined ? "Leave" : "Join"}
+                          {joinLoading
+                            ? "..."
+                            : isJoined
+                              ? "Leave"
+                              : club.joinRequests && club.joinRequests.some(r => r.user === userId && r.status === 'pending')
+                                ? "Request Sent"
+                                : club.privacy === 'private' ? "Request to Join" : "Join"}
                         </button>
                         <button
                           onClick={() => navigate(`/createEvent/${id}`)}
@@ -297,7 +323,8 @@ const SpecificClub = () => {
         <UserClubPosts clubId={id} />
       </div>
 
-    </>
+    </div>
+
   );
 };
 

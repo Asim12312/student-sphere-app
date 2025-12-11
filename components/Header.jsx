@@ -1,18 +1,161 @@
 import { IoIosNotifications } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
+import { useState, useEffect, useRef } from "react";
+import { NavLink, useNavigate } from 'react-router-dom';
+import NotificationDropdown from "./NotificationDropdown";
+import axios from "axios";
+import { CiEdit, CiLogout } from "react-icons/ci";
+import { CgNotes } from "react-icons/cg";
+import { FaShoppingCart, FaHome } from "react-icons/fa";
+import { ImClubs } from "react-icons/im";
+import { MdEmojiEvents } from "react-icons/md";
+
 const Header = (props) => {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [userId, setUserId] = useState(null);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
+  const navigate = useNavigate();
+
+  const userData = JSON.parse(localStorage.getItem("userData")) ?? { username: "User" };
+  const isMale = userData?.gender === 'male';
+  const avatarSrc = userData?.profilePic ?? (isMale ? "/male default avatar.png" : "/female default avatar.png");
+
+  useEffect(() => {
+    const id = localStorage.getItem('id');
+    if (id) {
+      setUserId(id);
+      fetchUnreadCount(id);
+    }
+
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const fetchUnreadCount = async (id) => {
+    try {
+      const response = await axios.get(`http://localhost:3000/notifications/get/${id}`);
+      if (response.data.success) {
+        const unread = response.data.notifications.filter(n => !n.read).length;
+        setUnreadCount(unread);
+      }
+    } catch (error) {
+      console.error("Error fetching notification count", error);
+    }
+  }
+
+  const toggleNotifications = () => {
+    setShowNotifications(!showNotifications);
+    if (!showNotifications && userId) {
+      fetchUnreadCount(userId); // Refresh when opening
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("userData");
+    localStorage.removeItem("id");
+    navigate('/');
+  };
+
+  const navLinkClasses = ({ isActive }) =>
+    `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors duration-200 font-medium ${isActive ? 'text-red-500 bg-red-50' : 'text-gray-600 hover:text-red-500 hover:bg-gray-50'
+    }`;
+
   return (
-    <>
-    <div className="grid grid-rows-2 grid-cols-2">
-                   <p className="pt-5 pl-5 font-bold text-4xl font-serif">{props.message1} </p>
-                   <div className="flex justify-end items-end mr-12 gap-7">
-                    <button className="text-4xl"><IoSearch /></button>
-                    <button className="text-4xl"><IoIosNotifications /></button>
-                   </div>
-                   <p className="pt-5 pl-5 font-bold text-lg italic">{props.message2}</p>
-                   
-                  </div>
-    </>
+    <div className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+
+          {/* Logo / Title Area */}
+          <div className="flex-shrink-0 flex items-center">
+            {/* You can add a logo here if available */}
+            <div className="flex flex-col">
+              <h1 className="text-2xl font-serif font-bold text-gray-800">{props.message1 || "University Portal"}</h1>
+              {props.message2 && <p className="text-sm text-gray-500 italic hidden md:block">{props.message2}</p>}
+            </div>
+          </div>
+
+          {/* Navigation Links (Hidden on small screens, can implement mobile menu later) */}
+          <nav className="hidden md:flex space-x-2">
+            <NavLink to="/dashboard" className={navLinkClasses}>
+              <FaHome className="text-xl" /> <span>Home</span>
+            </NavLink>
+            <NavLink to="/notes" className={navLinkClasses}>
+              <CgNotes className="text-xl" /> <span>Notes</span>
+            </NavLink>
+            <NavLink to="/market" className={navLinkClasses}>
+              <FaShoppingCart className="text-xl" /> <span>Market</span>
+            </NavLink>
+            <NavLink to="/clubs" className={navLinkClasses}>
+              <ImClubs className="text-xl" /> <span>Clubs</span>
+            </NavLink>
+            <NavLink to="/events" className={navLinkClasses}>
+              <MdEmojiEvents className="text-xl" /> <span>Events</span>
+            </NavLink>
+          </nav>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-6">
+            <button className="text-2xl text-gray-600 hover:text-gray-900"><IoSearch /></button>
+
+            {/* Notifications */}
+            <div className="relative">
+              <button className="text-3xl relative text-gray-600 hover:text-gray-900 pt-2" onClick={toggleNotifications}>
+                <IoIosNotifications />
+                {unreadCount > 0 && (
+                  <span className="absolute top-0 -right-1 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              <NotificationDropdown userId={userId} isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+            </div>
+
+            {/* Profile Dropdown */}
+            <div className="relative" ref={profileDropdownRef}>
+              <div
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-full transition border border-transparent hover:border-gray-200"
+              >
+                <img
+                  src={avatarSrc}
+                  alt="profile"
+                  className="w-10 h-10 rounded-full object-cover border border-gray-200"
+                />
+                <span className="hidden lg:block text-gray-700 font-medium text-sm truncate max-w-[100px]">{userData.username}</span>
+              </div>
+
+              {profileDropdownOpen && (
+                <div className="absolute top-full right-0 mt-2 bg-white shadow-lg border border-gray-100 rounded-xl w-48 z-50 overflow-hidden">
+                  <NavLink
+                    to="/edit"
+                    className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm gap-3 text-gray-700 transition"
+                    onClick={() => setProfileDropdownOpen(false)}
+                  >
+                    <CiEdit className="text-xl" /> Edit Profile
+                  </NavLink>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-4 py-3 hover:bg-red-50 text-sm text-red-600 gap-3 transition border-t border-gray-100"
+                  >
+                    <CiLogout className="text-xl" /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   )
 }
 

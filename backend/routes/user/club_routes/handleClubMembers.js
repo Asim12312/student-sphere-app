@@ -70,6 +70,7 @@ router.post('/joinClub', async (req, res) => {
       });
     }
 
+    // Check if already a member
     if (club.members.some(m => m.toString() === userId.toString())) {
       return res.status(400).json({
         success: false,
@@ -77,6 +78,44 @@ router.post('/joinClub', async (req, res) => {
       });
     }
 
+    // Check if it's a private club
+    if (club.privacy === 'private') {
+      // Check if request already exists
+      const existingRequest = club.joinRequests.find(
+        req => req.user.toString() === userId.toString() && req.status === 'pending'
+      );
+
+      if (existingRequest) {
+        return res.status(400).json({
+          success: false,
+          message: 'Join request already sent'
+        });
+      }
+
+      // Add to join requests
+      club.joinRequests.push({ user: userId });
+      await club.save();
+
+      const Notification = require('../../../models/notificationModel');
+      const notification = new Notification({
+        recipient: club.createdBy,
+        sender: userId,
+        type: 'JOIN_REQUEST',
+        message: `${user.username} requested to join your club ${club.name}`,
+        relatedId: club._id,
+        relatedModel: 'Club'
+      });
+      const savedNotif = await notification.save();
+      console.log('Notification saved:', savedNotif);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Join request sent successfully',
+        club
+      });
+    }
+
+    // Public club - Join directly
     club.members.push(userId);
     user.joinedClubs.push(clubId);
     await user.save();

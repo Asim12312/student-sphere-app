@@ -107,13 +107,30 @@ router.post('/createEvent', upload.single('image'), async (req, res) => {
 
 router.post('/getEvents', async (req, res) => {
     try {
-        const { userClubs } = req.body;
+        const { userClubs, userId } = req.body;
 
-        if (!Array.isArray(userClubs) || userClubs.length === 0) {
+        let allClubIds = [];
+
+        // Add joined clubs if provided
+        if (Array.isArray(userClubs) && userClubs.length > 0) {
+            allClubIds = [...userClubs];
+        }
+
+        // If userId is provided, find clubs created by this user
+        if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+            const createdClubs = await Club.find({ createdBy: userId }).select('_id');
+            const createdClubIds = createdClubs.map(club => club._id.toString());
+            allClubIds = [...allClubIds, ...createdClubIds];
+        }
+
+        // Deduplicate IDs
+        allClubIds = [...new Set(allClubIds)];
+
+        if (allClubIds.length === 0) {
             return res.status(200).json({ events: [] });
         }
 
-        const clubs = await Club.find({ _id: { $in: userClubs } }).populate('events');
+        const clubs = await Club.find({ _id: { $in: allClubIds } }).populate('events');
 
         if (!clubs || clubs.length === 0) {
             return res.status(200).json({ events: [] });

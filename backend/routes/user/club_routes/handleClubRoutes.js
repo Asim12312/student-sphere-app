@@ -23,7 +23,7 @@ const upload = multer({ storage });
 // Route to create club
 router.post('/createClub', upload.single('image'), async (req, res) => {
   try {
-    const { name, description, createdBy } = req.body;
+    const { name, description, createdBy, privacy } = req.body;
 
     if (!name || !description || !createdBy) {
       return res.status(400).json({ message: 'All fields are required' });
@@ -39,6 +39,7 @@ router.post('/createClub', upload.single('image'), async (req, res) => {
       description,
       imageURL,
       createdBy,
+      privacy: privacy || 'public'
     });
 
     await club.save();

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import SideBar from '../../../components/user/SideBar';
+import Header from '../../../components/Header';
 import SubHeader from './SubHeader';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ const CreateClub = () => {
   const navigate = useNavigate();
   const [clubName, setClubName] = useState('');
   const [clubDescription, setClubDescription] = useState('');
+  const [privacy, setPrivacy] = useState('public');
   const [clubImage, setClubImage] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -34,6 +35,7 @@ const CreateClub = () => {
     const formData = new FormData();
     formData.append('name', clubName);
     formData.append('description', clubDescription);
+    formData.append('privacy', privacy);
     formData.append('image', clubImage);
     formData.append('createdBy', userId);
 
@@ -94,72 +96,87 @@ const CreateClub = () => {
         </div>
       )}
 
-      <SideBar />
-      <SubHeader />
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Header message1="Create Club" message2="Start your own community" />
+        <div className="px-4">
+          <SubHeader />
+        </div>
 
-      {/* Club Form UI */}
-      <div className="min-h-screen bg-gray-100 py-10 px-4 md:px-10">
-        <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Create a New Club</h2>
+        <div className="flex-1 px-4 md:px-10 py-10">
+          <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-8">
+            <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Create a New Club</h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Club Name */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Club Name</label>
-              <input
-                type="text"
-                value={clubName}
-                onChange={(e) => setClubName(e.target.value)}
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Enter club name"
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Club Name */}
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Club Name</label>
+                <input
+                  type="text"
+                  value={clubName}
+                  onChange={(e) => setClubName(e.target.value)}
+                  required
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter club name"
+                />
+              </div>
 
-            {/* Club Description */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Club Description</label>
-              <textarea
-                value={clubDescription}
-                onChange={(e) => setClubDescription(e.target.value)}
-                required
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Describe your club..."
-              ></textarea>
-            </div>
+              {/* Club Description */}
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Club Description</label>
+                <textarea
+                  value={clubDescription}
+                  onChange={(e) => setClubDescription(e.target.value)}
+                  required
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Describe your club..."
+                ></textarea>
+              </div>
 
-            {/* Club Cover Image */}
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Club Cover Photo</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImage}
-                required
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+              {/* Club Privacy */}
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Club Privacy</label>
+                <select
+                  value={privacy}
+                  onChange={(e) => setPrivacy(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="public">Public (Anyone can join)</option>
+                  <option value="private">Private (Admin approval required)</option>
+                </select>
+              </div>
+
+              {/* Club Cover Image */}
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Club Cover Photo</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImage}
+                  required
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                   file:rounded-full file:border-0
                   file:text-sm file:font-semibold
                   file:bg-blue-50 file:text-blue-700
                   hover:file:bg-blue-100"
-              />
-            </div>
+                />
+              </div>
 
-            {/* Submit Button */}
-            <div className="text-center">
-              <button
-                type="submit"
-                disabled={uploading}
-                className={`${
-                  uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-                } text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200`}
-              >
-                {uploading ? 'Creating...' : 'Create Club'}
-              </button>
-            </div>
-          </form>
+              {/* Submit Button */}
+              <div className="text-center">
+                <button
+                  type="submit"
+                  disabled={uploading}
+                  className={`${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                    } text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200`}
+                >
+                  {uploading ? 'Creating...' : 'Create Club'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
 
+      </div>
       <ToastContainer position="top-right" autoClose={1500} />
     </>
   );

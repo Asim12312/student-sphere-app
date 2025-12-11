@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import SideBar from '../../../components/user/SideBar';
+
 import SubHeader from './SubHeader';
+import Header from '../../../components/Header';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import {setAllClubMembers, setCreatedClubMembersCount } from '../../../src/features/clubMembersSlice';
+import { setAllClubMembers, setCreatedClubMembersCount } from '../../../src/features/clubMembersSlice';
 
 const Discover = () => {
   const dispatch = useDispatch();
@@ -54,7 +55,7 @@ const Discover = () => {
       setFilteredClubs(res.data.clubs);
       setTotalPages(res.data.totalPages);
       const clubs = res.data.clubs;
-       const res1 = await axios.post("http://localhost:3000/handleMember/clubMembersCount", { clubs });
+      const res1 = await axios.post("http://localhost:3000/handleMember/clubMembersCount", { clubs });
       // Convert array to object for quick lookup
       const membersMap = {};
       res1.data.membersCount.forEach(({ clubId, count }) => {
@@ -91,8 +92,9 @@ const Discover = () => {
     }
   }, [searchClubs, allClubs]);
 
-  const handleJoinClub = async (e, clubId) => {
+  const handleJoinClub = async (e, club) => {
     e.stopPropagation(); // prevent parent div click
+    const clubId = club._id;
     const isAlreadyJoined = joinedClubs.includes(clubId);
 
     try {
@@ -104,25 +106,47 @@ const Discover = () => {
         setJoinedClubs((prev) => prev.filter(id => id !== clubId));
         toast.success("Left the club successfully!");
       } else {
-        await axios.post('http://localhost:3000/handleMember/joinClub', {
+        const res = await axios.post('http://localhost:3000/handleMember/joinClub', {
           userId,
           clubId,
         });
-        setJoinedClubs((prev) => [...prev, clubId]);
-        toast.success("Joined the club successfully!");
+
+        if (res.data.message === 'Join request sent successfully') {
+          toast.success("Join request sent!");
+          // Optionally update local state to reflect request sent immediately
+          // We can update filteredClubs to add the request to this club's joinRequests
+          setFilteredClubs(prev => prev.map(c =>
+            c._id === clubId
+              ? { ...c, joinRequests: [...(c.joinRequests || []), { user: userId, status: 'pending' }] }
+              : c
+          ));
+        } else {
+          setJoinedClubs((prev) => [...prev, clubId]);
+          toast.success("Joined the club successfully!");
+        }
       }
     } catch (err) {
       console.error("Error joining/unjoining club:", err);
-      alert("Something went wrong.");
+      // alert("Something went wrong.");
+      if (err.response && err.response.data && err.response.data.message) {
+        toast.error(err.response.data.message)
+      } else {
+        toast.error("Something went wrong.")
+      }
     }
   };
 
   return (
     <>
-      <SideBar />
-      <SubHeader />
 
-      <div className="min-h-screen bg-gray-100 px-4 py-10 md:px-10">
+      <div className="flex flex-col w-full relative">
+        <Header message1="Discover Clubs" message2="Join clubs that match your interests" />
+        <div className="mt-4 px-4">
+          <SubHeader />
+        </div>
+      </div>
+
+      <div className="min-h-screen bg-gray-100 px-4 py-4 md:px-10">
         {/* Your Clubs */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-800">Your Clubs</h1>
@@ -194,10 +218,20 @@ const Discover = () => {
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">{club.name}</h3>
                   <p className="text-gray-600 text-sm">{club.description}</p>
                   <button
-                    onClick={(e) => handleJoinClub(e, club._id)}
-                    className={`mt-3 ${joinedClubs.includes(club._id) ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} text-white px-4 py-2 rounded`}
+                    onClick={(e) => handleJoinClub(e, club)}
+                    className={`mt-3 ${joinedClubs.includes(club._id)
+                      ? "bg-red-500 hover:bg-red-600"
+                      : club.joinRequests && club.joinRequests.some(r => r.user === userId && r.status === 'pending')
+                        ? "bg-yellow-500 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-600"
+                      } text-white px-4 py-2 rounded`}
+                    disabled={!joinedClubs.includes(club._id) && club.joinRequests && club.joinRequests.some(r => r.user === userId && r.status === 'pending')}
                   >
-                    {joinedClubs.includes(club._id) ? "Leave Club" : "Join Club"}
+                    {joinedClubs.includes(club._id)
+                      ? "Leave Club"
+                      : club.joinRequests && club.joinRequests.some(r => r.user === userId && r.status === 'pending')
+                        ? "Request Sent"
+                        : club.privacy === 'private' ? "Request to Join" : "Join Club"}
                   </button>
                   <p>Total members: {allClubsCount[club._id] || 0} </p>
                 </div>

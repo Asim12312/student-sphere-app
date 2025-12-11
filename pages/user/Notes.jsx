@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import SideBar from "../../components/user/SideBar";
 import Header from "../../components/Header";
 import { ToastContainer, toast } from 'react-toastify';
 import { MdDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
-import { GiHamburgerMenu } from 'react-icons/gi';
 
 function getCurrentUser() {
-  const userData = localStorage.getItem("userData");
-  return userData ? JSON.parse(userData).userId : null;
+    const userData = localStorage.getItem("userData");
+    return userData ? JSON.parse(userData).userId : null;
 }
 
 const Notes = () => {
@@ -26,9 +24,9 @@ const Notes = () => {
     const [editTitle, setEditTitle] = useState('');
     const [editCourse, setEditCourse] = useState('');
     const [activeTab, setActiveTab] = useState('browse'); // 'browse' or 'manage'
-    const [sidebarOpen, setSidebarOpen] = useState(true);
 
-    
+
+
 
     useEffect(() => {
         fetchAllNotes();
@@ -66,7 +64,7 @@ const Notes = () => {
         formData.append("title", title);
         formData.append("course", course);
         formData.append("userId", userId);
-       
+
 
         try {
             const res = await axios.post('http://localhost:3000/file/upload', formData);
@@ -76,11 +74,11 @@ const Notes = () => {
                 setFile(null);
                 setCourse('');
                 toast.success("✅ File uploaded successfully");
-                
+
                 // Update both lists
                 setNotes(prev => [res.data.note, ...prev]);
                 setUserNotes(prev => [res.data.note, ...prev]);
-                
+
                 // Reset file input
                 const fileInput = document.querySelector('input[type="file"]');
                 if (fileInput) fileInput.value = '';
@@ -148,14 +146,14 @@ const Notes = () => {
 
             if (res.status === 200) {
                 // Update both lists
-                const updateNote = (note) => 
-                    note._id === noteId 
+                const updateNote = (note) =>
+                    note._id === noteId
                         ? { ...note, title: editTitle, course: editCourse }
                         : note;
 
                 setNotes(prev => prev.map(updateNote));
                 setUserNotes(prev => prev.map(updateNote));
-                
+
                 setEditingNoteId(null);
                 setEditTitle('');
                 setEditCourse('');
@@ -242,7 +240,7 @@ const Notes = () => {
                                 <div>
                                     <span className="font-semibold text-lg">{note.title}</span>
                                     <p className="text-sm text-gray-600">{note.course}</p>
-                                    
+
                                 </div>
                             )}
                         </div>
@@ -283,22 +281,10 @@ const Notes = () => {
 
     return (
         <>
-            {/* Hamburger icon always visible when sidebar is closed */}
-            {!sidebarOpen && (
-                <button
-                    className="fixed top-4 left-4 z-50 text-3xl bg-white rounded-full p-2 shadow"
-                    onClick={() => setSidebarOpen(true)}
-                    aria-label="Open sidebar"
-                >
-                    <GiHamburgerMenu />
-                </button>
-            )}
-            <div className={`h-screen w-screen ${sidebarOpen ? "md:grid md:grid-cols-[1fr_5fr]" : ""}`}>
-                {sidebarOpen && (
-                    <SideBar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-                )}
-                <div className="overflow-y-auto">
-                    <Header message1="Notes" message2="Browse and manage your notes" />
+            <div className="min-h-screen bg-gray-50 flex flex-col">
+                <Header message1="Notes" message2="Browse and manage your notes" />
+                <div className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
+                    {/* Upload Section */}
 
                     {/* Upload Section */}
                     <div className="mb-6">
@@ -345,7 +331,7 @@ const Notes = () => {
                         </div>
                     </div>
 
-                    
+
 
                     {/* Content Section */}
                     <div className="mt-2">
@@ -391,7 +377,7 @@ const Notes = () => {
 
                         {/* Notes List */}
                         <div className="flex justify-center items-center">
-                            {activeTab === 'browse' 
+                            {activeTab === 'browse'
                                 ? renderNotesList(notes, false)
                                 : renderNotesList(userNotes, true)
                             }

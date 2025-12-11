@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import SideBar from '../../../components/user/SideBar';
+import Header from '../../../components/Header';
 import SubHeader from './SubHeader';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -36,23 +36,25 @@ const ClubMembers = () => {
   };
 
   const filteredMembers = members.filter(member => {
-  const matchesSearch =
-    (member.fullName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (member.username?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-    (member.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      (member.fullName?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (member.username?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
+      (member.email?.toLowerCase() || '').includes(searchTerm.toLowerCase());
 
-  const matchesRole = filterRole === 'all' || member.role === filterRole;
+    const matchesRole = filterRole === 'all' || member.role === filterRole;
 
-  return matchesSearch && matchesRole;
-});
+    return matchesSearch && matchesRole;
+  });
 
 
   return (
-    <>
-      <SideBar />
-      <SubHeader />
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header message1="Club Members" message2="View all members of this club" />
+      <div className="px-4">
+        <SubHeader />
+      </div>
 
-      <div className="min-h-screen bg-gray-100 px-4 py-10 md:px-10">
+      <div className="flex-1 px-4 py-10 md:px-10">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-xl shadow-md p-6 mb-6">
             <button
@@ -85,7 +87,7 @@ const ClubMembers = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
-              
+
             </div>
           </div>
 
@@ -99,8 +101,8 @@ const ClubMembers = () => {
               {filteredMembers.length === 0 ? (
                 <div className="col-span-full text-center py-12">
                   <p className="text-gray-500 text-lg">
-                    {searchTerm || filterRole !== 'all' 
-                      ? 'No members found matching your criteria' 
+                    {searchTerm || filterRole !== 'all'
+                      ? 'No members found matching your criteria'
                       : 'No members in this club yet'}
                   </p>
                 </div>
@@ -124,13 +126,12 @@ const ClubMembers = () => {
                         <p className="text-sm text-gray-500">{member.email}</p>
                       </div>
                     </div>
-                    
+
                     <div className="mt-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        member.role === 'admin' 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${member.role === 'admin'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-green-100 text-green-800'
+                        }`}>
                         {member.role === 'admin' ? '👑 Admin' : '👤 Member'}
                       </span>
                     </div>
@@ -141,7 +142,8 @@ const ClubMembers = () => {
           )}
         </div>
       </div>
-    </>
+    </div>
+
   );
 };
 

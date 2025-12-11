@@ -15,6 +15,26 @@ const clubCreationSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Image URL is required']
   },
+  privacy: {
+    type: String,
+    enum: ['public', 'private'],
+    default: 'public'
+  },
+  joinRequests: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected'],
+      default: 'pending'
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
