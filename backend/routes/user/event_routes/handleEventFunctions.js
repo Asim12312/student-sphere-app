@@ -7,7 +7,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { cloudinary } = require('../../../cloudinary/cloudinaryConfig');
 const Club = require('./../../../models/clubModel');
 const User = require('./../../../models/user');
-
+router.use(express.json());
 // Cloudinary storage config
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -105,20 +105,29 @@ router.post('/createEvent', upload.single('image'), async (req, res) => {
     }
 });
 
-router.get('/getEvents', async (req, res) => {
+router.post('/getEvents', async (req, res) => {
     try {
-        const userEvents = req.query.events;
-        const events = await Event.findById(userEvents);
-        if (!events) {
-            return res.status(404).json({ message: 'Event not found' });
-        }
-        return res.status(200).json({ events });
+        const { userClubs } = req.body;
 
-    }
-    catch (err) {
+        if (!Array.isArray(userClubs) || userClubs.length === 0) {
+            return res.status(200).json({ events: [] });
+        }
+
+        const clubs = await Club.find({ _id: { $in: userClubs } }).populate('events');
+
+        if (!clubs || clubs.length === 0) {
+            return res.status(200).json({ events: [] });
+        }
+
+        // Collect all events from all clubs
+        const events = clubs.flatMap(club => club.events || []);
+
+        return res.status(200).json({ events });
+    } catch (err) {
         console.error("Error fetching events:", err.message);
-        res.status(500).json({ message: err.message });
+        return res.status(500).json({ message: err.message });
     }
-})
+});
+
 
 module.exports = router;
