@@ -7,6 +7,7 @@ const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const { cloudinary } = require('../../../cloudinary/cloudinaryConfig');
 const Club = require('./../../../models/clubModel');
 const User = require('./../../../models/user');
+const Notification = require('./../../../models/notificationModel');
 router.use(express.json());
 // Cloudinary storage config
 const storage = new CloudinaryStorage({
@@ -87,7 +88,14 @@ router.post('/createEvent', upload.single('image'), async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        if (club.createdBy == userId) {
+        const isOwner = club.createdBy.toString() === userId;
+        const isMember = club.members.some(memberId => memberId.toString() === userId);
+
+        if (!isOwner && !isMember) {
+            return res.status(403).json({ message: 'You must be a member of the club to create an event.' });
+        }
+
+        if (isOwner) {
             event.status = "approved";
         }
         else {
@@ -97,7 +105,20 @@ router.post('/createEvent', upload.single('image'), async (req, res) => {
         await club.save();
 
         await event.save();
-        return res.status(200).json({ message: 'Event sent for approval to admin' });
+
+        if (event.status === 'pending') {
+            const notification = new Notification({
+                recipient: club.createdBy,
+                sender: userId,
+                type: 'EVENT_REQUEST',
+                message: `${user.username || 'A member'} requested to create an event: ${title}`,
+                relatedId: event._id,
+                relatedModel: 'Event'
+            });
+            await notification.save();
+        }
+
+        return res.status(200).json({ message: isOwner ? 'Event created successfully' : 'Event sent for approval to admin' });
     }
     catch (error) {
         console.error("Error creating event:", error.message);
@@ -130,7 +151,10 @@ router.post('/getEvents', async (req, res) => {
             return res.status(200).json({ events: [] });
         }
 
-        const clubs = await Club.find({ _id: { $in: allClubIds } }).populate('events');
+        const clubs = await Club.find({ _id: { $in: allClubIds } }).populate({
+            path: 'events',
+            match: { status: 'approved' }
+        });
 
         if (!clubs || clubs.length === 0) {
             return res.status(200).json({ events: [] });
@@ -146,5 +170,99 @@ router.post('/getEvents', async (req, res) => {
     }
 });
 
+
+// Get Event Details
+router.get('/getEvent/:eventId', async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.eventId).populate('createdBy', 'username email profilePicture');
+        if (!event) return res.status(404).json({ success: false, message: 'Event not found' });
+        res.status(200).json({ success: true, event });
+    } catch (error) {
+        console.error('Error fetching event:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+// Approve Event
+router.post('/approveEvent', async (req, res) => {
+    try {
+        const { eventId, adminId, notificationId } = req.body;
+
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ success: false, message: 'Event not found' });
+
+        const club = await Club.findById(event.createdInClub);
+        if (!club) return res.status(404).json({ success: false, message: 'Club not found' });
+
+        if (club.createdBy.toString() !== adminId) {
+            return res.status(403).json({ success: false, message: 'Not authorized' });
+        }
+
+        event.status = 'approved';
+        await event.save();
+
+        // Mark notification as read if provided
+        if (notificationId) {
+            await Notification.findByIdAndUpdate(notificationId, { read: true });
+        }
+
+        // Notify creator
+        const notification = new Notification({
+            recipient: event.createdBy,
+            sender: adminId,
+            type: 'EVENT_APPROVED',
+            message: `Your event "${event.title}" has been approved!`,
+            relatedId: event._id,
+            relatedModel: 'Event'
+        });
+        await notification.save();
+
+        res.status(200).json({ success: true, message: 'Event approved' });
+    } catch (error) {
+        console.error('Error approving event:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
+
+// Reject Event
+router.post('/rejectEvent', async (req, res) => {
+    try {
+        const { eventId, adminId, notificationId } = req.body;
+
+        const event = await Event.findById(eventId);
+        if (!event) return res.status(404).json({ success: false, message: 'Event not found' });
+
+        const club = await Club.findById(event.createdInClub);
+        if (!club) return res.status(404).json({ success: false, message: 'Club not found' });
+
+        if (club.createdBy.toString() !== adminId) {
+            return res.status(403).json({ success: false, message: 'Not authorized' });
+        }
+
+        event.status = 'rejected';
+        await event.save();
+
+        // Mark notification as read if provided
+        if (notificationId) {
+            await Notification.findByIdAndUpdate(notificationId, { read: true });
+        }
+
+        // Notify creator
+        const notification = new Notification({
+            recipient: event.createdBy,
+            sender: adminId,
+            type: 'EVENT_REJECTED',
+            message: `Your event "${event.title}" was rejected.`,
+            relatedId: event._id,
+            relatedModel: 'Event'
+        });
+        await notification.save();
+
+        res.status(200).json({ success: true, message: 'Event rejected' });
+    } catch (error) {
+        console.error('Error rejecting event:', error);
+        res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+});
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const express = require('express');
 const Club = require('../../../models/clubModel');
-const User = require('../../../models/user')
+const User = require('../../../models/user');
+const Notification = require('../../../models/notificationModel');
 const router = express.Router();
 
 // CHECK MEMBERSHIP STATUS
@@ -96,17 +97,72 @@ router.post('/joinClub', async (req, res) => {
       club.joinRequests.push({ user: userId });
       await club.save();
 
-      const Notification = require('../../../models/notificationModel');
-      const notification = new Notification({
-        recipient: club.createdBy,
-        sender: userId,
-        type: 'JOIN_REQUEST',
-        message: `${user.username} requested to join your club ${club.name}`,
-        relatedId: club._id,
-        relatedModel: 'Club'
-      });
-      const savedNotif = await notification.save();
-      console.log('Notification saved:', savedNotif);
+      console.log(`Join request added for user ${userId} to club ${club.name}`);
+      console.log(`Creating notification for admin: ${club.createdBy}`);
+      console.log(`🔍 [DEBUG] club.createdBy type: ${typeof club.createdBy}`);
+      console.log(`🔍 [DEBUG] club.createdBy value: ${club.createdBy}`);
+      console.log(`🔍 [DEBUG] club.createdBy toString(): ${club.createdBy.toString()}`);
+
+      try {
+        const notification = new Notification({
+          recipient: club.createdBy,
+          sender: userId,
+          type: 'JOIN_REQUEST', // Ensure this matches notificationModel enum
+          message: `${user.username} requested to join your club ${club.name}`,
+          relatedId: club._id,
+          relatedModel: 'Club'
+        });
+
+        const savedNotif = await notification.save();
+        console.log('✅ Notification created successfully!');
+        console.log('   - Notification ID:', savedNotif._id);
+        console.log('   - Recipient (admin):', savedNotif.recipient);
+        console.log('   - Recipient type:', typeof savedNotif.recipient);
+        console.log('   - Sender (requester):', savedNotif.sender);
+        console.log('   - Type:', savedNotif.type);
+
+        // Immediately verify notification can be queried
+        const verifyNotif = await Notification.findById(savedNotif._id);
+        console.log('🔍 [VERIFY] Notification queryable by ID:', verifyNotif ? 'YES ✓' : 'NO ✗');
+
+        const notifsByRecipient = await Notification.find({ recipient: club.createdBy });
+        console.log(`🔍 [VERIFY] Total notifications for admin (${club.createdBy}):`, notifsByRecipient.length);
+        if (notifsByRecipient.length > 0) {
+          console.log('   - Latest notification:', {
+            id: notifsByRecipient[notifsByRecipient.length - 1]._id,
+            message: notifsByRecipient[notifsByRecipient.length - 1].message,
+            read: notifsByRecipient[notifsByRecipient.length - 1].read
+          });
+        }
+
+        // Emit real-time notification to admin(s) via Socket.IO if connected
+        try {
+          const recipientId = club.createdBy.toString();
+          // Populate sender for richer client payload
+          const populatedNotif = await Notification.findById(savedNotif._id).populate('sender', 'username profilePicture');
+
+          if (global && global.userSockets && global.io) {
+            const sockets = global.userSockets.get(recipientId) || [];
+            sockets.forEach(sockId => {
+              try {
+                global.io.to(sockId).emit('notification', populatedNotif);
+              } catch (emitErr) {
+                console.error('Error emitting notification to socket', sockId, emitErr);
+              }
+            });
+            console.log(`🔔 Emitted notification to ${sockets.length} socket(s) for recipient ${recipientId}`);
+          } else {
+            console.log('🔔 Socket.IO not initialized or no sockets found for recipient');
+          }
+        } catch (emitErr) {
+          console.error('❌ Error emitting notification via Socket.IO:', emitErr);
+        }
+      } catch (notifError) {
+        console.error('❌ Error creating notification:', notifError);
+        console.error('   - Error message:', notifError.message);
+        console.error('   - Stack:', notifError.stack);
+        // Don't fail the request if notification fails, but log it
+      }
 
       return res.status(200).json({
         success: true,

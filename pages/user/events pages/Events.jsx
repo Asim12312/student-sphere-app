@@ -1,31 +1,39 @@
 import React, { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import Header from '../../../components/Header'
 import axios from 'axios'
 import EventCard from '../../../components/user/EventCard'
 
 const Events = () => {
 
+  const { id } = useParams();
   const userData = JSON.parse(localStorage.getItem("userData"));
   const userId = userData?.userId;
   const [events, setEvents] = useState([]);
   const [clubsJoined, setClubsJoined] = useState([]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (id) {
+      // If viewing specific club events
+      setClubsJoined([id]);
+    } else {
+      // Otherwise fetch all joined clubs
+      if (!userId) return;
 
-    axios.get("http://localhost:3000/user/getUserClubs", {
-      params: {
-        userId: userId
-      }
-    })
-      .then((response) => {
-        console.log("Joined clubs:", response.data);
-        setClubsJoined(response.data);
+      axios.get("http://localhost:3000/user/getUserClubs", {
+        params: {
+          userId: userId
+        }
       })
-      .catch((error) => {
-        console.error("Error fetching user clubs:", error);
-      })
-  }, [userId])
+        .then((response) => {
+          console.log("Joined clubs:", response.data);
+          setClubsJoined(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching user clubs:", error);
+        })
+    }
+  }, [userId, id])
 
   useEffect(() => {
     if (!Array.isArray(clubsJoined) || clubsJoined.length === 0) return;
@@ -33,7 +41,12 @@ const Events = () => {
     console.log("Fetching events for clubs:", clubsJoined);
 
     axios.post("http://localhost:3000/eventFunctions/getEvents", {
-      userClubs: clubsJoined
+      userClubs: clubsJoined,
+      // userId is optional depending on if we want to show created events even if not joined,
+      // but usually if we are just viewing a club's events we might just want that club's events.
+      // Keeping userId ensures we also see events created by user if logic requires it, 
+      // but for specific club view, passing just the ID in userClubs is enough based on backend logic.
+      userId: id ? null : userId
     })
       .then((response) => {
         console.log("Events fetched:", response.data);
@@ -43,7 +56,7 @@ const Events = () => {
         console.error("Error fetching events:", error);
       });
 
-  }, [clubsJoined]);
+  }, [clubsJoined, id, userId]);
 
 
   return (

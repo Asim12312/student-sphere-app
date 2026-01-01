@@ -36,34 +36,35 @@ function App() {
           {/*User routes */}
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard"   element={<Dashboard />} />
-           <Route path="/edit" element={<EditProfile />} />
-           <Route path="/notes" element={<Notes />} />
-           <Route path="/events" element={<Events />} />
-           <Route path="/clubs" element={<Posts />} />
-           <Route path="/market" element={<MarketPlace />} />
-           <Route path="/sellProduct" element={<SellProduct />} />
-           <Route path="/products/:id" element={<SpecificProduct />} />
-           <Route path="/joinedClubs" element={<JoinedClubs />} />
-           <Route path="/discoverClubs" element={<Discover />} />
-            <Route path="/createClub" element={<CreateClub />} />
-            <Route path="/club/:id" element={<SpecificClub />} />
-            <Route path="/club/:id/members" element={<ClubMembers />} />
-            <Route path="/createEvent/:id" element={<CreateEventForm />} />
-           {/* Admin routes */}
-           <Route path="/AdminDashboard" element={<AdminDashboard />} />
-           <Route path="/AdminEdit" element={<AdminEdit />} />
-           <Route path="/manageNotes" element={<ManageNotes />} />
-           <Route path="/manageEvents" element={<ManageEvent />} />
-           <Route path="/manageMarket" element={<ManageMarket />} />
-           <Route path="/manageClub" element={<ManageClub />} />
-           <Route path="/viewCart" element={<ViewCart />} />
-           <Route path="/onboarding-complete" element={<OnboardingComplete />} />
-           <Route path="/payment-success" element={<PaymentSuccess />} />
-           <Route path="/payment-cancelled" element={<PaymentCancelled />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/edit" element={<EditProfile />} />
+          <Route path="/notes" element={<Notes />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/events/:id" element={<Events />} />
+          <Route path="/clubs" element={<Posts />} />
+          <Route path="/market" element={<MarketPlace />} />
+          <Route path="/sellProduct" element={<SellProduct />} />
+          <Route path="/products/:id" element={<SpecificProduct />} />
+          <Route path="/joinedClubs" element={<JoinedClubs />} />
+          <Route path="/discoverClubs" element={<Discover />} />
+          <Route path="/createClub" element={<CreateClub />} />
+          <Route path="/club/:id" element={<SpecificClub />} />
+          <Route path="/club/:id/members" element={<ClubMembers />} />
+          <Route path="/createEvent/:id" element={<CreateEventForm />} />
+          {/* Admin routes */}
+          <Route path="/AdminDashboard" element={<AdminDashboard />} />
+          <Route path="/AdminEdit" element={<AdminEdit />} />
+          <Route path="/manageNotes" element={<ManageNotes />} />
+          <Route path="/manageEvents" element={<ManageEvent />} />
+          <Route path="/manageMarket" element={<ManageMarket />} />
+          <Route path="/manageClub" element={<ManageClub />} />
+          <Route path="/viewCart" element={<ViewCart />} />
+          <Route path="/onboarding-complete" element={<OnboardingComplete />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-cancelled" element={<PaymentCancelled />} />
         </Routes>
       </BrowserRouter>
-      
+
     </>
   )
 }

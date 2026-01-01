@@ -4,6 +4,8 @@ const app = express();
 const db = require('./db');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const http = require('http');
+const { Server } = require('socket.io');
 
 // Middleware configuration
 app.use(bodyParser.json());
@@ -35,6 +37,7 @@ const handleClubPosts = require('./routes/user/club_routes/handleClubPosts')
 const eventFunctions = require('./routes/user/event_routes/handleEventFunctions')
 const notificationRoutes = require('./routes/user/notificationRoutes');
 const handleClubRequests = require('./routes/user/club_routes/handleClubRequests');
+const debugRoutes = require('./routes/user/debugRoutes');
 
 app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
@@ -51,7 +54,45 @@ app.use('/post', handleClubPosts);
 app.use('/eventFunctions', eventFunctions);
 app.use('/notifications', notificationRoutes);
 app.use('/clubRequest', handleClubRequests);
+app.use('/debug', debugRoutes);
+app.use('/debug', debugRoutes);
+
+// Create HTTP server and attach Socket.IO
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*'
+  }
+});
+
+// Expose io and a user->sockets map globally so route handlers can emit events
+global.io = io;
+global.userSockets = new Map();
+
+io.on('connection', (socket) => {
+  console.log('Socket connected:', socket.id);
+  // Expect the client to send the userId as a query param
+  const userId = socket.handshake.query?.userId;
+  if (userId) {
+    const idStr = userId.toString();
+    const existing = global.userSockets.get(idStr) || [];
+    existing.push(socket.id);
+    global.userSockets.set(idStr, existing);
+    console.log(`User ${idStr} associated with socket ${socket.id}`);
+  }
+
+  socket.on('disconnect', () => {
+    // Remove socket from any user mapping
+    for (const [uid, arr] of global.userSockets.entries()) {
+      const filtered = arr.filter(sid => sid !== socket.id);
+      if (filtered.length === 0) global.userSockets.delete(uid);
+      else global.userSockets.set(uid, filtered);
+    }
+    console.log('Socket disconnected:', socket.id);
+  });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

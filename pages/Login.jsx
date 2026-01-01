@@ -22,6 +22,8 @@ const Login = () => {
       console.log(response);
       if (response.data.role == 'user') {
         localStorage.setItem("userData", JSON.stringify(response.data));
+        localStorage.setItem("id", response.data.userId); // Store userId separately for notifications
+        console.log('✅ [Login] User logged in, userId stored:', response.data.userId);
         toast.success("✅ Logged in");
         setTimeout(() => {
           navigate("/dashboard");
@@ -29,6 +31,8 @@ const Login = () => {
       }
       if (response.data.role == 'admin') {
         localStorage.setItem("adminData", JSON.stringify(response.data));
+        localStorage.setItem("id", response.data.userId); // Store userId separately for notifications
+        console.log('✅ [Login] Admin logged in, userId stored:', response.data.userId);
         toast.success("✅ Logged in");
         setTimeout(() => {
           navigate("/AdminDashboard");

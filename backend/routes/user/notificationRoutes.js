@@ -7,22 +7,34 @@ router.get('/get/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
 
+        console.log(`🔍 [GET NOTIFICATIONS] Fetching for user: ${userId}`);
+        console.log(`   - userId type: ${typeof userId}`);
+        console.log(`   - userId length: ${userId.length}`);
+
+        // Check total notifications in DB first
+        const allNotifications = await Notification.find({});
+        console.log(`   - Total notifications in DB: ${allNotifications.length}`);
+
+        // Try to find notifications for this recipient
         const notifications = await Notification.find({ recipient: userId })
             .sort({ createdAt: -1 })
             .populate('sender', 'username profilePicture') // Populate sender info
             .populate({
                 path: 'relatedId',
+                // The schema uses refPath: 'relatedModel', so Mongoose will automatically
+                // use the value in relatedModel field to determine which model to populate
                 select: 'name privacy'
-                // We might need dynamic ref here but for now mainly Club names are needed. 
-                // Mongoose doesn't support dynamic ref in populate easily without refPath, 
-                // but 'relatedId' in model didn't use refPath. 
-                // We can just send the ID and let frontend handle or rely on message.
-                // Let's rely on message for now to be safe or try populating if model supports it.
-                // In notificationModel, relatedId doesn't have a ref. So populate won't work directly unless we specify model.
             });
 
-        // Since relatedId doesn't have a ref in schema, we can't auto-populate it easily without knowing the model.
-        // However, for typical list display, the 'message' field is sufficient.
+        console.log(`   - Found ${notifications.length} notifications for user ${userId}`);
+
+        // Debug: Show all recipient IDs in database
+        if (notifications.length === 0 && allNotifications.length > 0) {
+            console.log('   - Sample recipient IDs from DB:');
+            allNotifications.slice(0, 5).forEach((n, idx) => {
+                console.log(`     [${idx}] ${n.recipient} (type: ${typeof n.recipient})`);
+            });
+        }
 
         res.status(200).json({
             success: true,
@@ -30,9 +42,11 @@ router.get('/get/:userId', async (req, res) => {
         });
     } catch (error) {
         console.error('Error fetching notifications:', error);
+        console.error('Error details:', error.message);
         res.status(500).json({
             success: false,
-            message: 'Failed to fetch notifications'
+            message: 'Failed to fetch notifications',
+            error: error.message
         });
     }
 });

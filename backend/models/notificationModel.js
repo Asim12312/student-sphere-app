@@ -13,7 +13,7 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['JOIN_REQUEST', 'REQUEST_APPROVED', 'REQUEST_REJECTED', 'OTHER'],
+        enum: ['JOIN_REQUEST', 'REQUEST_APPROVED', 'REQUEST_REJECTED', 'EVENT_REQUEST', 'EVENT_APPROVED', 'EVENT_REJECTED', 'OTHER'],
         required: true
     },
     message: {

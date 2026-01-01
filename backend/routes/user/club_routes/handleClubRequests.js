@@ -7,7 +7,7 @@ const router = express.Router();
 // APPROVE JOIN REQUEST
 router.post('/approveRequest', async (req, res) => {
     try {
-        const { clubId, userId, adminId } = req.body;
+        const { clubId, userId, adminId, notificationId } = req.body;
 
         const club = await Club.findById(clubId);
 
@@ -46,6 +46,10 @@ router.post('/approveRequest', async (req, res) => {
 
         await club.save();
 
+        if (notificationId) {
+            await Notification.findByIdAndUpdate(notificationId, { read: true });
+        }
+
         // Create notification for user
         const notification = new Notification({
             recipient: userId,
@@ -68,7 +72,7 @@ router.post('/approveRequest', async (req, res) => {
 // REJECT JOIN REQUEST
 router.post('/rejectRequest', async (req, res) => {
     try {
-        const { clubId, userId, adminId } = req.body;
+        const { clubId, userId, adminId, notificationId } = req.body;
 
         const club = await Club.findById(clubId);
 
@@ -93,6 +97,10 @@ router.post('/rejectRequest', async (req, res) => {
         // Remove from array
         club.joinRequests = club.joinRequests.filter(r => r.user.toString() !== userId);
         await club.save();
+
+        if (notificationId) {
+            await Notification.findByIdAndUpdate(notificationId, { read: true });
+        }
 
         // Create notification for user
         const notification = new Notification({

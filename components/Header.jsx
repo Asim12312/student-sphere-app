@@ -1,6 +1,7 @@
 import { IoIosNotifications } from "react-icons/io";
 import { IoSearch } from "react-icons/io5";
 import { useState, useEffect, useRef } from "react";
+import { io as socketIOClient } from 'socket.io-client';
 import { NavLink, useNavigate } from 'react-router-dom';
 import NotificationDropdown from "./NotificationDropdown";
 import axios from "axios";
@@ -13,9 +14,12 @@ import { MdEmojiEvents } from "react-icons/md";
 const Header = (props) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [incomingNotification, setIncomingNotification] = useState(null);
   const [userId, setUserId] = useState(null);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const profileDropdownRef = useRef(null);
+  // Socket ref to keep socket instance across renders
+  const headerSocketRef = useRef(null);
   const navigate = useNavigate();
 
   const userData = JSON.parse(localStorage.getItem("userData")) ?? { username: "User" };
@@ -24,38 +28,80 @@ const Header = (props) => {
 
   useEffect(() => {
     const id = localStorage.getItem('id');
+    console.log('🔑 [Header] User ID from localStorage:', id);
+
     if (id) {
       setUserId(id);
       fetchUnreadCount(id);
-    }
 
-    const handleClickOutside = (event) => {
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
-        setProfileDropdownOpen(false);
+      // Poll for new notifications every 30 seconds
+      const pollInterval = setInterval(() => {
+        console.log('🔄 [Header] Polling for new notifications...');
+        fetchUnreadCount(id);
+      }, 30000);
+
+      // Setup Socket.IO client for real-time notifications
+      try {
+        const socket = socketIOClient('http://localhost:3000', { query: { userId: id } });
+        socket.on('connect', () => console.log('🔌 [Socket] Connected', socket.id));
+        socket.on('notification', (notif) => {
+          console.log('🔔 [Socket] Notification received in Header:', notif);
+          // Save incoming notification so dropdown can display it immediately
+          setIncomingNotification(notif);
+          // Refresh unread count
+          fetchUnreadCount(id);
+        });
+
+        // attach socket instance so we can disconnect on cleanup
+        // store it on ref to avoid re-creating
+        headerSocketRef.current = socket;
+      } catch (socketError) {
+        console.error('❌ [Socket] Failed to connect', socketError);
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+
+      const handleClickOutside = (event) => {
+        if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+          setProfileDropdownOpen(false);
+        }
+      };
+      document.addEventListener("mousedown", handleClickOutside);
+
+      return () => {
+        clearInterval(pollInterval);
+        document.removeEventListener("mousedown", handleClickOutside);
+        // disconnect socket if exists
+        if (headerSocketRef.current) {
+          try { headerSocketRef.current.disconnect(); } catch (e) { }
+        }
+      };
+    }
   }, []);
+
 
   const fetchUnreadCount = async (id) => {
     try {
+      console.log('📊 [Header] Fetching unread count for user:', id);
       const response = await axios.get(`http://localhost:3000/notifications/get/${id}`);
       if (response.data.success) {
         const unread = response.data.notifications.filter(n => !n.read).length;
+        console.log('📬 [Header] Unread notifications:', unread);
         setUnreadCount(unread);
       }
     } catch (error) {
-      console.error("Error fetching notification count", error);
+      console.error("❌ [Header] Error fetching notification count", error);
     }
   }
 
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
     if (!showNotifications && userId) {
+      console.log('🔔 [Header] Opening notifications, refreshing count...');
       fetchUnreadCount(userId); // Refresh when opening
+    }
+    // Refresh count when closing to update badge
+    if (showNotifications && userId) {
+      console.log('🔔 [Header] Closing notifications, refreshing count...');
+      setTimeout(() => fetchUnreadCount(userId), 500);
     }
   };
 
@@ -116,7 +162,7 @@ const Header = (props) => {
                   </span>
                 )}
               </button>
-              <NotificationDropdown userId={userId} isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+              <NotificationDropdown userId={userId} isOpen={showNotifications} onClose={() => setShowNotifications(false)} incomingNotification={incomingNotification} />
             </div>
 
             {/* Profile Dropdown */}

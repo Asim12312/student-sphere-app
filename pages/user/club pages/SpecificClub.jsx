@@ -280,8 +280,18 @@ const SpecificClub = () => {
                         </button>
                         <button
                           onClick={() => navigate(`/createEvent/${id}`)}
-                          className='ml-5 mr-5 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed'>Create event</button>
-                        <button className='bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md shadow disabled:opacity-50 disabled:cursor-not-allowed'>View events</button>
+                          disabled={!isJoined}
+                          className={`ml-5 mr-5 px-4 py-2 rounded-md shadow text-white ${!isJoined ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+                        >
+                          Create event
+                        </button>
+                        <button
+                          onClick={() => navigate(`/events/${id}`)}
+                          disabled={!isJoined}
+                          className={`px-4 py-2 rounded-md shadow text-white ${!isJoined ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600'}`}
+                        >
+                          View events
+                        </button>
                       </div>
                     )}
 
