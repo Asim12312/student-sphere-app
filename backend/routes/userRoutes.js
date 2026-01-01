@@ -123,4 +123,28 @@ router.get("/getUserClubs", async (req, res) => {
   }
 })
 
+// Get User Profile (Public/Private stats)
+router.get("/profile/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    res.json({
+      success: true,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.userEmail,
+        gender: user.gender,
+        profilePicture: user.profilePicture,
+        reputationPoints: user.reputationPoints,
+        badges: user.badges,
+        role: user.role
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Error fetching profile" });
+  }
+});
+
 module.exports = router;

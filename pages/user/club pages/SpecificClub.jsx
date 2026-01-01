@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import { selectAllClubMembers } from '../../../src/features/clubSelectors';
 import UserClubPosts from '../../../components/user/UserClubPosts';
 import CreatePostForm from '../../../components/user/CreatePostForm';
+import ClubChat from '../../../components/user/ClubChat';
 
 const SpecificClub = () => {
   const allClubMembers = useSelector(selectAllClubMembers);
@@ -17,6 +18,7 @@ const SpecificClub = () => {
   const [club, setClub] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editClub, setEditClub] = useState(false);
+  const [activeTab, setActiveTab] = useState('posts');
   const [clubName, setClubName] = useState('');
   const [clubDescription, setClubDescription] = useState('');
   const [clubImage, setClubImage] = useState(null);
@@ -322,15 +324,56 @@ const SpecificClub = () => {
           )}
         </div>
 
-        {/* Create Post Section - Only visible if member or admin */}
+        {/* Tabs for Joined Members */}
         {(isJoined || isAdmin) && (
-          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 mt-8">
-            <h3 className="text-xl font-semibold mb-4 text-gray-800">Create New Post</h3>
-            <CreatePostForm clubId={id} />
+          <div className="mt-8 mb-6 border-b border-gray-200">
+            <div className="flex gap-8">
+              <button
+                onClick={() => setActiveTab('posts')}
+                className={`pb-4 px-2 text-lg font-semibold transition-colors relative ${activeTab === 'posts' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                📝 Club Feed
+                {activeTab === 'posts' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />}
+              </button>
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`pb-4 px-2 text-lg font-semibold transition-colors relative ${activeTab === 'chat' ? 'text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                💬 Chat Room
+                {activeTab === 'chat' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600 rounded-t-full" />}
+              </button>
+            </div>
           </div>
         )}
 
-        <UserClubPosts clubId={id} />
+        {/* Content based on Tab */}
+        {activeTab === 'posts' ? (
+          <>
+            {/* Create Post Section - Only visible if member or admin */}
+            {(isJoined || isAdmin) && (
+              <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 mb-8">
+                <h3 className="text-xl font-semibold mb-4 text-gray-800">Create New Post</h3>
+                <CreatePostForm clubId={id} />
+              </div>
+            )}
+            <UserClubPosts clubId={id} />
+          </>
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            {(isJoined || isAdmin) ? (
+              <ClubChat
+                clubId={id}
+                userId={userId}
+                username={userData?.username}
+                userProfilePic={userData?.profilePic}
+              />
+            ) : (
+              <div className="text-center py-10 bg-gray-100 rounded-xl">
+                <p className="text-gray-500">Join the club to access the chat room.</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
     </div>

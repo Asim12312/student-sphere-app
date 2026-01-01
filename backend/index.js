@@ -42,6 +42,8 @@ const blogRoutes = require('./routes/user/blogRoutes');
 const quizRoutes = require('./routes/user/quizRoutes');
 const forumRoutes = require('./routes/user/forumRoutes');
 
+const chatRoutes = require('./routes/user/club_routes/chatRoutes');
+
 app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
 app.use('/category', categoryRoutes);
@@ -61,7 +63,7 @@ app.use('/debug', debugRoutes);
 app.use('/blogs', blogRoutes);
 app.use('/quizzes', quizRoutes);
 app.use('/forum', forumRoutes);
-app.use('/debug', debugRoutes);
+app.use('/chat', chatRoutes);
 
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);
@@ -96,6 +98,50 @@ io.on('connection', (socket) => {
     }
     console.log('Socket disconnected:', socket.id);
   });
+
+  // --- Club Chat Events ---
+  const Message = require('./models/messageModel');
+
+  socket.on('join_club_room', (clubId) => {
+    socket.join(clubId);
+    console.log(`Socket ${socket.id} joined club room: ${clubId}`);
+  });
+
+  socket.on('leave_club_room', (clubId) => {
+    socket.leave(clubId);
+    console.log(`Socket ${socket.id} left club room: ${clubId}`);
+  });
+
+  socket.on('send_club_message', async (data) => {
+    // data: { clubId, senderId, content, senderName, senderPic }
+    try {
+      const { clubId, senderId, content } = data;
+
+      // Save to DB
+      const newMessage = new Message({
+        clubId,
+        sender: senderId,
+        content
+      });
+      await newMessage.save();
+
+      // Broadcast to room (including sender)
+      // We attach sender info for immediate display
+      const messageToEmit = {
+        _id: newMessage._id,
+        clubId,
+        sender: { _id: senderId, username: data.senderName, profilePicture: data.senderPic },
+        content,
+        createdAt: newMessage.createdAt
+      };
+
+      io.to(clubId).emit('receive_club_message', messageToEmit);
+
+    } catch (err) {
+      console.error('Error sending message:', err);
+    }
+  });
+
 });
 
 const PORT = process.env.PORT || 3000;

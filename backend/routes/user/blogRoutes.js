@@ -17,6 +17,8 @@ const storage = new CloudinaryStorage({
 });
 const upload = multer({ storage: storage });
 
+const { awardPoints } = require('../../utils/gamification');
+
 // Create Blog
 router.post('/create', upload.single('headerImage'), async (req, res) => {
     try {
@@ -43,6 +45,10 @@ router.post('/create', upload.single('headerImage'), async (req, res) => {
         });
 
         await newBlog.save();
+
+        // Award Points
+        await awardPoints(author, 'CREATE_BLOG');
+
         res.status(201).json({ success: true, blog: newBlog });
     } catch (error) {
         console.error('Error creating blog:', error);

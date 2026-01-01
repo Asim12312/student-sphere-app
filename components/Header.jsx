@@ -18,6 +18,7 @@ const Header = (props) => {
   const [incomingNotification, setIncomingNotification] = useState(null);
   const [userId, setUserId] = useState(null);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [reputationPoints, setReputationPoints] = useState(0);
   const profileDropdownRef = useRef(null);
   // Socket ref to keep socket instance across renders
   const headerSocketRef = useRef(null);
@@ -34,6 +35,13 @@ const Header = (props) => {
     if (id) {
       setUserId(id);
       fetchUnreadCount(id);
+
+      // Fetch User Stats
+      axios.get(`http://localhost:3000/user/profile/${id}`).then(res => {
+        if (res.data.success) {
+          setReputationPoints(res.data.user.reputationPoints || 0);
+        }
+      }).catch(err => console.error(err));
 
       // Poll for new notifications every 30 seconds
       const pollInterval = setInterval(() => {
@@ -183,7 +191,10 @@ const Header = (props) => {
                   alt="profile"
                   className="w-10 h-10 rounded-full object-cover border border-gray-200"
                 />
-                <span className="hidden lg:block text-gray-700 font-medium text-sm truncate max-w-[100px]">{userData.username}</span>
+                <div className="flex flex-col items-start">
+                  <span className="hidden lg:block text-gray-700 font-medium text-sm truncate max-w-[100px]">{userData.username}</span>
+                  <span className="hidden lg:block text-xs text-yellow-600 font-bold">⭐ {reputationPoints} pts</span>
+                </div>
               </div>
 
               {profileDropdownOpen && (

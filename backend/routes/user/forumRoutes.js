@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Question = require('../../models/questionModel');
+const { awardPoints } = require('../../utils/gamification');
 
 // Ask Question
 router.post('/ask', async (req, res) => {
@@ -20,6 +21,10 @@ router.post('/ask', async (req, res) => {
         });
 
         await newQuestion.save();
+
+        // Award Points
+        await awardPoints(author, 'ASK_QUESTION');
+
         res.status(201).json({ success: true, question: newQuestion });
     } catch (error) {
         console.error('Error creating question:', error);
@@ -129,6 +134,13 @@ router.post('/accept/:id', async (req, res) => {
         if (answerFound) {
             question.isSolved = true;
             await question.save();
+
+            // Find the author of the accepted answer to award points
+            const acceptedAns = question.answers.find(ans => ans.isAccepted);
+            if (acceptedAns) {
+                await awardPoints(acceptedAns.author, 'SOLVE_QUESTION');
+            }
+
             res.status(200).json({ success: true, message: 'Answer accepted' });
         } else {
             res.status(404).json({ success: false, message: 'Answer not found' });

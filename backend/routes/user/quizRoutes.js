@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Quiz = require('../../models/quizModel');
+const { awardPoints } = require('../../utils/gamification');
 
 // Create Quiz
 router.post('/create', async (req, res) => {
@@ -22,6 +23,10 @@ router.post('/create', async (req, res) => {
         });
 
         await newQuiz.save();
+
+        // Award Points
+        await awardPoints(creator, 'CREATE_QUIZ');
+
         res.status(201).json({ success: true, quiz: newQuiz });
     } catch (error) {
         console.error('Error creating quiz:', error);
@@ -112,6 +117,12 @@ router.post('/submit/:id', async (req, res) => {
         };
         quiz.attempts.push(attempt);
         await quiz.save();
+
+        // Check for Ace (e.g., > 80%)
+        const percentage = (score / quiz.questions.length) * 100;
+        if (percentage >= 80) {
+            await awardPoints(userId, 'ACE_QUIZ');
+        }
 
         res.status(200).json({ success: true, score, total: quiz.questions.length, results });
 

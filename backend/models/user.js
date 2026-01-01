@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const userSchema = new mongoose.Schema({
-     username: {
+    username: {
         type: String,
         required: true
     },
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female', 'other'],
         required: true
     },
-  
+
     role: {
         type: String,
         enum: ['admin', 'user'],
@@ -33,9 +33,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: null
     },
-    joinedClubs:{
+    joinedClubs: {
         type: Array,
-        default:[]   
+        default: []
+    },
+    reputationPoints: {
+        type: Number,
+        default: 0
+    },
+    badges: {
+        type: [String],
+        default: []
     }
 
 })
