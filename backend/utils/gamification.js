@@ -3,15 +3,15 @@ const User = require('../models/user');
 const POINTS = {
     CREATE_BLOG: 10,
     SOLVE_QUESTION: 20,
-    ACE_QUIZ: 15,
     CREATE_QUIZ: 10,
-    ASK_QUESTION: 5
+    ASK_QUESTION: 5,
+    CREATE_TREND: 5
 };
 
 const BADGES = {
     'Blogger': { count: 5, action: 'CREATE_BLOG', name: 'Wordsmith ✍️' },
     'Solver': { count: 3, action: 'SOLVE_QUESTION', name: 'Problem Solver 🧩' },
-    'QuizMaster': { count: 3, action: 'ACE_QUIZ', name: 'Smarty Pants 🤓' }
+    'Trendsetter': { count: 5, action: 'CREATE_TREND', name: 'Trendsetter 🚀' } // New Badge idea
 };
 
 const awardPoints = async (userId, actionType) => {

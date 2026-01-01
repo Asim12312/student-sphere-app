@@ -31,9 +31,7 @@ import CreateEventForm from "../components/user/CreateEventForm"
 import Blogs from "../pages/user/blog pages/Blogs"
 import CreateBlog from "../pages/user/blog pages/CreateBlog"
 import SpecificBlog from "../pages/user/blog pages/SpecificBlog"
-import Quizzes from "../pages/user/quiz pages/Quizzes"
-import CreateQuiz from "../pages/user/quiz pages/CreateQuiz"
-import TakeQuiz from "../pages/user/quiz pages/TakeQuiz"
+import Trends from '../pages/user/trend pages/Trends';
 import Forum from "../pages/user/forum pages/Forum"
 import CreateQuestion from "../pages/user/forum pages/CreateQuestion"
 import SpecificQuestion from "../pages/user/forum pages/SpecificQuestion"
@@ -56,9 +54,7 @@ function App() {
           <Route path="/blogs/create" element={<CreateBlog />} />
           <Route path="/blogs/:id" element={<SpecificBlog />} />
 
-          <Route path="/quizzes" element={<Quizzes />} />
-          <Route path="/quizzes/create" element={<CreateQuiz />} />
-          <Route path="/quizzes/:id" element={<TakeQuiz />} />
+          <Route path="/trends" element={<Trends />} />
 
           <Route path="/forum" element={<Forum />} />
           <Route path="/forum/ask" element={<CreateQuestion />} />

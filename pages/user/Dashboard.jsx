@@ -5,7 +5,7 @@ import { MdEventNote } from "react-icons/md";
 import { FaNoteSticky } from "react-icons/fa6";
 import { TbClubsFilled } from "react-icons/tb";
 import { FaShoppingCart } from "react-icons/fa";
-import { IoTrophy, IoChatbubbles } from "react-icons/io5";
+import { IoTrendingUpOutline, IoChatbubbles } from "react-icons/io5";
 
 const UserDashboard = () => {
   const userData = JSON.parse(localStorage.getItem("userData"));
@@ -50,15 +50,15 @@ const UserDashboard = () => {
               </div>
             </div>
 
-            {/* Quizzes */}
+            {/* Trends */}
             <div className="bg-purple-200 rounded-2xl p-6 h-64 flex flex-col justify-between shadow-sm hover:shadow-md transition">
               <div className="flex items-end space-x-2">
-                <p className="font-semibold text-2xl font-serif">Quiz Arena</p>
-                <IoTrophy className="text-2xl" />
+                <p className="font-semibold text-2xl font-serif">Campus Trends</p>
+                <IoTrendingUpOutline className="text-2xl" />
               </div>
-              <p className="text-sm opacity-70">Challenge yourself & others</p>
+              <p className="text-sm opacity-70">See what students are talking about</p>
               <div className="flex justify-end">
-                <NavLink to='/quizzes' className="flex justify-center items-center h-10 w-24 bg-purple-500 text-white rounded-xl font-semibold shadow hover:bg-purple-600 transition">Play</NavLink>
+                <NavLink to='/trends' className="flex justify-center items-center h-10 w-24 bg-purple-500 text-white rounded-xl font-semibold shadow hover:bg-purple-600 transition">View</NavLink>
               </div>
             </div>
 

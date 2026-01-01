@@ -39,10 +39,11 @@ const notificationRoutes = require('./routes/user/notificationRoutes');
 const handleClubRequests = require('./routes/user/club_routes/handleClubRequests');
 const debugRoutes = require('./routes/user/debugRoutes');
 const blogRoutes = require('./routes/user/blogRoutes');
-const quizRoutes = require('./routes/user/quizRoutes');
 const forumRoutes = require('./routes/user/forumRoutes');
 
 const chatRoutes = require('./routes/user/club_routes/chatRoutes');
+
+const trendRoutes = require('./routes/user/trendRoutes');
 
 app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
@@ -61,7 +62,7 @@ app.use('/notifications', notificationRoutes);
 app.use('/clubRequest', handleClubRequests);
 app.use('/debug', debugRoutes);
 app.use('/blogs', blogRoutes);
-app.use('/quizzes', quizRoutes);
+app.use('/trends', trendRoutes);
 app.use('/forum', forumRoutes);
 app.use('/chat', chatRoutes);
 

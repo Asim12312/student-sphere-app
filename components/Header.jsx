@@ -9,8 +9,8 @@ import { CiEdit, CiLogout } from "react-icons/ci";
 import { FaShoppingCart, FaHome } from "react-icons/fa";
 import { FaNoteSticky } from "react-icons/fa6";
 import { ImClubs } from "react-icons/im";
+import { IoNotificationsOutline, IoSearchOutline, IoNewspaperOutline, IoTrendingUpOutline, IoChatbubblesOutline, IoChatbubbles } from 'react-icons/io5';
 import { MdEmojiEvents } from "react-icons/md";
-import { IoTrophy, IoChatbubbles } from "react-icons/io5";
 
 const Header = (props) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -146,8 +146,8 @@ const Header = (props) => {
             <NavLink to="/blogs" className={navLinkClasses}>
               <FaNoteSticky className="text-xl" /> <span>Blogs</span>
             </NavLink>
-            <NavLink to="/quizzes" className={navLinkClasses}>
-              <IoTrophy className="text-xl" /> <span>Quizzes</span>
+            <NavLink to="/trends" className={navLinkClasses}>
+              <IoTrendingUpOutline className="text-xl" /> <span>Trends</span>
             </NavLink>
             <NavLink to="/forum" className={navLinkClasses}>
               <IoChatbubbles className="text-xl" /> <span>Forum</span>
