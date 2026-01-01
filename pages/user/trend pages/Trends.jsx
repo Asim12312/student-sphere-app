@@ -252,10 +252,19 @@ const Trends = () => {
                                 )}
 
                                 <div className="flex gap-4">
-                                    <img src={displayTrend.author?.profilePicture || "/male default avatar.png"} className="w-12 h-12 rounded-full object-cover" />
+                                    <img
+                                        src={displayTrend.author?.profilePicture || "/male default avatar.png"}
+                                        className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80"
+                                        onClick={() => window.location.href = `/profile/${displayTrend.author?.username}`}
+                                    />
                                     <div className="flex-1 w-full">
                                         <div className="flex gap-2 items-center">
-                                            <h3 className="font-bold text-gray-900">{displayTrend.author?.username || "Unknown"}</h3>
+                                            <h3
+                                                className="font-bold text-gray-900 hover:underline cursor-pointer"
+                                                onClick={() => window.location.href = `/profile/${displayTrend.author?.username}`}
+                                            >
+                                                {displayTrend.author?.username || "Unknown"}
+                                            </h3>
                                             <span className="text-gray-500 text-sm">@{displayTrend.author?.username?.toLowerCase().replace(/\s/g, '')}</span>
                                             <span className="text-gray-400 text-sm">· {new Date(displayTrend.createdAt).toLocaleDateString()}</span>
                                         </div>

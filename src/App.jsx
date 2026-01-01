@@ -35,6 +35,8 @@ import Trends from '../pages/user/trend pages/Trends';
 import Forum from "../pages/user/forum pages/Forum"
 import CreateQuestion from "../pages/user/forum pages/CreateQuestion"
 import SpecificQuestion from "../pages/user/forum pages/SpecificQuestion"
+import UserProfile from '../pages/user/profile pages/UserProfile';
+import Feed from '../pages/user/feed pages/Feed';
 
 function App() {
 
@@ -45,8 +47,9 @@ function App() {
           {/*User routes */}
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/edit" element={<EditProfile />} />
+          <Route path="/dashboard" element={<Feed />} />
+          <Route path="/feed" element={<Feed />} />
+          <Route path="/editprofile" element={<EditProfile />} />
           {/* <Route path="/notes" element={<Notes />} /> */}
 
           {/* New Interaction Routes */}
@@ -59,6 +62,7 @@ function App() {
           <Route path="/forum" element={<Forum />} />
           <Route path="/forum/ask" element={<CreateQuestion />} />
           <Route path="/forum/:id" element={<SpecificQuestion />} />
+          <Route path="/profile/:username" element={<UserProfile />} />
 
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<Events />} />

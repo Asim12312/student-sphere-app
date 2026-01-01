@@ -42,8 +42,9 @@ const blogRoutes = require('./routes/user/blogRoutes');
 const forumRoutes = require('./routes/user/forumRoutes');
 
 const chatRoutes = require('./routes/user/club_routes/chatRoutes');
-
 const trendRoutes = require('./routes/user/trendRoutes');
+const socialRoutes = require('./routes/user/socialRoutes');
+const profilePostRoutes = require('./routes/user/profilePostRoutes');
 
 app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
@@ -63,6 +64,8 @@ app.use('/clubRequest', handleClubRequests);
 app.use('/debug', debugRoutes);
 app.use('/blogs', blogRoutes);
 app.use('/trends', trendRoutes);
+app.use('/social', socialRoutes);
+app.use('/profile-posts', profilePostRoutes);
 app.use('/forum', forumRoutes);
 app.use('/chat', chatRoutes);
 

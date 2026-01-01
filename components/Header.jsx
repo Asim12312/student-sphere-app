@@ -198,19 +198,42 @@ const Header = (props) => {
               </div>
 
               {profileDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 bg-white shadow-lg border border-gray-100 rounded-xl w-48 z-50 overflow-hidden">
-                  <NavLink
-                    to="/edit"
-                    className="flex items-center px-4 py-3 hover:bg-gray-50 text-sm gap-3 text-gray-700 transition"
-                    onClick={() => setProfileDropdownOpen(false)}
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-bold text-gray-900">{userData.username}</p>
+                    <p className="text-xs text-gray-500">{userData.userEmail}</p>
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-bold">
+                        ⭐ {reputationPoints} Points
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigate(`/profile/${userData.username}`);
+                      setProfileDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-gray-700"
                   >
-                    <CiEdit className="text-xl" /> Edit Profile
-                  </NavLink>
+                    <CiEdit size={20} />
+                    <span className="text-sm">My Profile</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigate('/editprofile');
+                      setProfileDropdownOpen(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-gray-700"
+                  >
+                    <CiEdit size={20} />
+                    <span className="text-sm">Edit Profile</span>
+                  </button>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center w-full px-4 py-3 hover:bg-red-50 text-sm text-red-600 gap-3 transition border-t border-gray-100"
+                    className="w-full text-left px-4 py-2 hover:bg-red-50 flex items-center gap-3 text-red-600 border-t border-gray-100"
                   >
-                    <CiLogout className="text-xl" /> Logout
+                    <CiLogout size={20} />
+                    <span className="text-sm">Logout</span>
                   </button>
                 </div>
               )}

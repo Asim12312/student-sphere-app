@@ -44,8 +44,48 @@ const userSchema = new mongoose.Schema({
     badges: {
         type: [String],
         default: []
+    },
+    // Social Profile Fields
+    followers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    following: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    }],
+    bio: {
+        type: String,
+        maxlength: 500,
+        default: ''
+    },
+    coverPhoto: {
+        type: String,
+        default: ''
+    },
+    location: {
+        type: String,
+        default: ''
+    },
+    website: {
+        type: String,
+        default: ''
+    },
+    birthdate: {
+        type: Date
+    },
+    privacy: {
+        profileVisibility: {
+            type: String,
+            enum: ['public', 'private'],
+            default: 'public'
+        },
+        messagePermission: {
+            type: String,
+            enum: ['everyone', 'followers'],
+            default: 'everyone'
+        }
     }
-
 })
 const User = mongoose.model('User', userSchema)
 module.exports = User
