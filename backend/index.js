@@ -38,6 +38,9 @@ const eventFunctions = require('./routes/user/event_routes/handleEventFunctions'
 const notificationRoutes = require('./routes/user/notificationRoutes');
 const handleClubRequests = require('./routes/user/club_routes/handleClubRequests');
 const debugRoutes = require('./routes/user/debugRoutes');
+const blogRoutes = require('./routes/user/blogRoutes');
+const quizRoutes = require('./routes/user/quizRoutes');
+const forumRoutes = require('./routes/user/forumRoutes');
 
 app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
@@ -55,6 +58,9 @@ app.use('/eventFunctions', eventFunctions);
 app.use('/notifications', notificationRoutes);
 app.use('/clubRequest', handleClubRequests);
 app.use('/debug', debugRoutes);
+app.use('/blogs', blogRoutes);
+app.use('/quizzes', quizRoutes);
+app.use('/forum', forumRoutes);
 app.use('/debug', debugRoutes);
 
 // Create HTTP server and attach Socket.IO

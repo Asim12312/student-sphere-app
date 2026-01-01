@@ -6,10 +6,11 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import NotificationDropdown from "./NotificationDropdown";
 import axios from "axios";
 import { CiEdit, CiLogout } from "react-icons/ci";
-import { CgNotes } from "react-icons/cg";
 import { FaShoppingCart, FaHome } from "react-icons/fa";
+import { FaNoteSticky } from "react-icons/fa6";
 import { ImClubs } from "react-icons/im";
 import { MdEmojiEvents } from "react-icons/md";
+import { IoTrophy, IoChatbubbles } from "react-icons/io5";
 
 const Header = (props) => {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -134,8 +135,14 @@ const Header = (props) => {
             <NavLink to="/dashboard" className={navLinkClasses}>
               <FaHome className="text-xl" /> <span>Home</span>
             </NavLink>
-            <NavLink to="/notes" className={navLinkClasses}>
-              <CgNotes className="text-xl" /> <span>Notes</span>
+            <NavLink to="/blogs" className={navLinkClasses}>
+              <FaNoteSticky className="text-xl" /> <span>Blogs</span>
+            </NavLink>
+            <NavLink to="/quizzes" className={navLinkClasses}>
+              <IoTrophy className="text-xl" /> <span>Quizzes</span>
+            </NavLink>
+            <NavLink to="/forum" className={navLinkClasses}>
+              <IoChatbubbles className="text-xl" /> <span>Forum</span>
             </NavLink>
             <NavLink to="/market" className={navLinkClasses}>
               <FaShoppingCart className="text-xl" /> <span>Market</span>
