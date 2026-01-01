@@ -23,6 +23,20 @@ const trendSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
+    comments: [{
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        text: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now }
+    }],
+    originalTrend: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Trend',
+        default: null
+    },
+    isRepost: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now
