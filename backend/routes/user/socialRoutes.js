@@ -49,9 +49,42 @@ router.get('/profile/:identifier', async (req, res) => {
 // Update profile info
 router.put('/profile/update', async (req, res) => {
     try {
-        const { userId, bio, location, website, birthdate, privacy } = req.body;
+        const { userId, username, userEmail, gender, bio, location, website, birthdate, privacy } = req.body;
 
+        // Build update data object
         const updateData = {};
+
+        // Check if username is being updated and validate uniqueness
+        if (username !== undefined) {
+            const existingUser = await User.findOne({ username, _id: { $ne: userId } });
+            if (existingUser) {
+                return res.status(400).json({ success: false, message: 'Username already taken' });
+            }
+            updateData.username = username.trim();
+        }
+
+        // Check if email is being updated and validate uniqueness and format
+        if (userEmail !== undefined) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(userEmail)) {
+                return res.status(400).json({ success: false, message: 'Invalid email format' });
+            }
+            const existingUser = await User.findOne({ userEmail, _id: { $ne: userId } });
+            if (existingUser) {
+                return res.status(400).json({ success: false, message: 'Email already in use' });
+            }
+            updateData.userEmail = userEmail.trim().toLowerCase();
+        }
+
+        // Validate gender if provided
+        if (gender !== undefined) {
+            if (!['male', 'female', 'other'].includes(gender)) {
+                return res.status(400).json({ success: false, message: 'Invalid gender value' });
+            }
+            updateData.gender = gender;
+        }
+
+        // Add other fields
         if (bio !== undefined) updateData.bio = bio;
         if (location !== undefined) updateData.location = location;
         if (website !== undefined) updateData.website = website;

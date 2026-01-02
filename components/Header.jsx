@@ -216,17 +216,7 @@ const Header = (props) => {
                     className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-gray-700"
                   >
                     <CiEdit size={20} />
-                    <span className="text-sm">My Profile</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigate('/editprofile');
-                      setProfileDropdownOpen(false);
-                    }}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-3 text-gray-700"
-                  >
-                    <CiEdit size={20} />
-                    <span className="text-sm">Edit Profile</span>
+                    <span className="text-sm">Profile</span>
                   </button>
                   <button
                     onClick={handleLogout}

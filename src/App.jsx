@@ -49,7 +49,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Feed />} />
           <Route path="/feed" element={<Feed />} />
-          <Route path="/editprofile" element={<EditProfile />} />
+          {/* <Route path="/editprofile" element={<EditProfile />} /> */}
           {/* <Route path="/notes" element={<Notes />} /> */}
 
           {/* New Interaction Routes */}
