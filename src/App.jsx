@@ -23,6 +23,7 @@ import PaymentSuccess from "../pages/user/PaymentSuccess"
 import PaymentCancelled from "../pages/user/PaymentCancelled"
 import ManageUsers from "../pages/admin/ManageUsers"
 import ManageContent from "../pages/admin/ManageContent"
+import ManageReports from "../pages/admin/ManageReports"
 import Discover from "../pages/user/club pages/Discover"
 import JoinedClubs from "../pages/user/club pages/JoinedClubs"
 import Posts from "../pages/user/Posts"
@@ -81,8 +82,8 @@ function App() {
           {/* Admin routes */}
           <Route path="/AdminDashboard" element={<AdminDashboard />} />
           <Route path="/AdminEdit" element={<AdminEdit />} />
-          <Route path="/manageNotes" element={<ManageNotes />} />
           <Route path="/manageEvents" element={<ManageEvent />} />
+          <Route path="/manageReports" element={<ManageReports />} />
           <Route path="/manageMarket" element={<ManageMarket />} />
           <Route path="/manageClubs" element={<ManageClub />} />
           <Route path="/manageUsers" element={<ManageUsers />} />

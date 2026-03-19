@@ -1,26 +1,73 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { NavLink } from "react-router-dom";
-import { MdEventNote } from "react-icons/md";
-import { FaNoteSticky, FaUsers } from "react-icons/fa6";
+import { MdEventNote, MdContentPasteSearch, MdOutlineReportProblem } from "react-icons/md";
+import { FaUsers } from "react-icons/fa6";
 import { TbClubsFilled } from "react-icons/tb";
 import { FaShoppingCart } from "react-icons/fa";
-import { MdContentPasteSearch } from "react-icons/md";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 
 const AdminDashboard = () => {
     const userData = JSON.parse(localStorage.getItem("adminData")) || { username: "Admin" };
+    const [stats, setStats] = useState({
+        users: 0,
+        clubs: 0,
+        products: 0,
+        pendingReports: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await axios.get("http://localhost:3000/admin/stats", {
+                    headers: { Authorization: `Bearer ${userData.token}` }
+                });
+                setStats(res.data);
+            } catch (error) {
+                console.error("Failed to fetch admin statistics", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchStats();
+    }, [userData.token]);
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <AdminSidebar />
 
             <div className="flex-grow p-4 md:p-8 pt-28">
-                <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-10 mb-8">
+                
+                {/* Header Section */}
+                <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-10 mb-8">
                     <h1 className="text-4xl font-bold font-serif text-gray-800 mb-2 border-b pb-4">
                         Welcome, {userData?.username}
                     </h1>
                     <p className="text-gray-600 text-lg">
                         Select a moderation module below to manage the platform infrastructure.
                     </p>
+                </div>
+
+                {/* Analytics Snapshot */}
+                <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-white border text-center border-gray-100 shadow-sm p-6 rounded-2xl flex flex-col items-center justify-center">
+                        <p className="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-widest">Total Users</p>
+                        {loading ? <div className="h-10 w-10 border-t-2 border-indigo-600 animate-spin rounded-full"></div> : <p className="text-4xl font-black text-indigo-600">{stats.users}</p>}
+                    </div>
+                    <div className="bg-white border text-center border-gray-100 shadow-sm p-6 rounded-2xl flex flex-col items-center justify-center">
+                        <p className="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-widest">Active Clubs</p>
+                        {loading ? <div className="h-10 w-10 border-t-2 border-fuchsia-600 animate-spin rounded-full"></div> : <p className="text-4xl font-black text-fuchsia-600">{stats.clubs}</p>}
+                    </div>
+                    <div className="bg-white border text-center border-gray-100 shadow-sm p-6 rounded-2xl flex flex-col items-center justify-center">
+                        <p className="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-widest">Market Items</p>
+                        {loading ? <div className="h-10 w-10 border-t-2 border-pink-600 animate-spin rounded-full"></div> : <p className="text-4xl font-black text-pink-600">{stats.products}</p>}
+                    </div>
+                    <div className="bg-white border text-center border-gray-100 shadow-sm p-6 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden">
+                        {stats.pendingReports > 0 && <div className="absolute top-0 right-0 w-16 h-16 bg-red-100 rounded-bl-full z-0"></div>}
+                        <p className="text-gray-500 text-sm font-semibold mb-1 uppercase tracking-widest z-10 relative">Pending Reports</p>
+                        {loading ? <div className="h-10 w-10 border-t-2 border-red-600 animate-spin rounded-full"></div> : <p className="text-4xl font-black text-red-600 z-10 relative">{stats.pendingReports}</p>}
+                    </div>
                 </div>
 
                 <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -100,18 +147,18 @@ const AdminDashboard = () => {
                         </NavLink>
                     </div>
 
-                    {/* Manage Notes */}
-                    <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition">
-                        <div className="flex items-center gap-3 mb-6 border-b border-amber-200 pb-4">
-                            <FaNoteSticky className="text-amber-600 text-3xl" />
-                            <p className="font-semibold text-2xl font-serif text-amber-900">Manage Notes</p>
+                    {/* Manage Reports */}
+                    <div className="bg-red-50 border border-red-100 rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition">
+                        <div className="flex items-center gap-3 mb-6 border-b border-red-200 pb-4">
+                            <MdOutlineReportProblem className="text-red-600 text-3xl" />
+                            <p className="font-semibold text-2xl font-serif text-red-900">Manage Reports</p>
                         </div>
-                        <p className="text-amber-700 text-sm mb-6 flex-grow">Provide official academic notes and materials to the student body.</p>
+                        <p className="text-red-700 text-sm mb-6 flex-grow">Review and resolve content flags submitted by users across all platforms.</p>
                         <NavLink
-                            to="/manageNotes"
-                            className="bg-amber-500 hover:bg-amber-600 text-center text-white font-semibold text-lg rounded-xl px-6 py-3 transition w-full"
+                            to="/manageReports"
+                            className="bg-red-500 hover:bg-red-600 text-center text-white font-semibold text-lg rounded-xl px-6 py-3 transition w-full"
                         >
-                            Open Notes Panel
+                            Open Reports Panel
                         </NavLink>
                     </div>
 

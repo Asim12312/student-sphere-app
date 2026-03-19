@@ -28,7 +28,6 @@ app.use((req, res, next) => {
     next();
   }
 });
-const uploadRoutes = require('./routes/admin/adminNotes');
 const userRoutes = require('./routes/userRoutes')
 const categoryRoutes = require('./routes/admin/categories');
 const sellProduct = require('./routes/user/sellProduct')
@@ -57,9 +56,12 @@ const adminEventsRoutes = require('./routes/admin/adminEvents');
 const adminClubsRoutes = require('./routes/admin/adminClubs');
 const adminProductsRoutes = require('./routes/admin/adminProducts');
 const adminContentRoutes = require('./routes/admin/adminContent');
+const reportRoutes = require('./routes/user/reportRoutes');
+const adminReports = require('./routes/admin/adminReports');
+const adminStatsRoutes = require('./routes/admin/adminStats');
 
-app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
+app.use('/report', reportRoutes);
 app.use('/category', categoryRoutes);
 app.use('/sell', sellProduct);
 app.use('/products', getProducts);
@@ -81,12 +83,17 @@ app.use('/profile-posts', profilePostRoutes);
 app.use('/forum', forumRoutes);
 app.use('/chat', chatRoutes);
 
-// Admin Routes
-app.use('/admin/users', adminUsersRoutes);
-app.use('/admin/events', adminEventsRoutes);
-app.use('/admin/clubs', adminClubsRoutes);
-app.use('/admin/products', adminProductsRoutes);
-app.use('/admin/content', adminContentRoutes);
+const adminAuth = require('./middleware/adminAuth');
+
+// Admin Routes - Secured with adminAuth middleware
+app.use('/admin/users', adminAuth, adminUsersRoutes);
+app.use('/admin/events', adminAuth, adminEventsRoutes);
+app.use('/admin/clubs', adminAuth, adminClubsRoutes);
+app.use('/admin/products', adminAuth, adminProductsRoutes);
+app.use('/admin/content', adminAuth, adminContentRoutes);
+app.use('/admin/reports', adminAuth, adminReports);
+app.use('/admin/stats', adminAuth, adminStatsRoutes);
+
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {

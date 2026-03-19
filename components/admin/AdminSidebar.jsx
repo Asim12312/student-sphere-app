@@ -3,7 +3,7 @@ import { CiEdit, CiLogout } from "react-icons/ci";
 import { CgNotes } from "react-icons/cg";
 import { FaShoppingCart } from "react-icons/fa";
 import { ImClubs } from "react-icons/im";
-import { MdEventNote } from "react-icons/md";
+import { MdEventNote, MdOutlineReportProblem } from "react-icons/md";
 import { FaHome } from "react-icons/fa";
 import React from 'react';
 
@@ -97,14 +97,14 @@ const AdminSideBar = () => {
                         </NavLink>
 
                         <NavLink
-                            to="/manageNotes"
+                            to="/manageReports"
                             className={({ isActive }) =>
                                 `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
                             }
                         >
                             <span className="flex items-center gap-1">
-                                Notes
-                                <CgNotes className="text-xl hidden lg:block" />
+                                Reports
+                                <MdOutlineReportProblem className="text-xl hidden lg:block" />
                             </span>
                         </NavLink>
 
