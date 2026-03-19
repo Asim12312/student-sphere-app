@@ -11,6 +11,12 @@ const { Server } = require('socket.io');
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(cors());
+
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
 app.use(express.urlencoded({ extended: true }));
 
 // Handle trailing slashes - remove them to prevent 301 redirects
@@ -46,6 +52,12 @@ const trendRoutes = require('./routes/user/trendRoutes');
 const socialRoutes = require('./routes/user/socialRoutes');
 const profilePostRoutes = require('./routes/user/profilePostRoutes');
 
+const adminUsersRoutes = require('./routes/admin/adminUsers');
+const adminEventsRoutes = require('./routes/admin/adminEvents');
+const adminClubsRoutes = require('./routes/admin/adminClubs');
+const adminProductsRoutes = require('./routes/admin/adminProducts');
+const adminContentRoutes = require('./routes/admin/adminContent');
+
 app.use('/file', uploadRoutes);
 app.use('/user', userRoutes);
 app.use('/category', categoryRoutes);
@@ -69,6 +81,12 @@ app.use('/profile-posts', profilePostRoutes);
 app.use('/forum', forumRoutes);
 app.use('/chat', chatRoutes);
 
+// Admin Routes
+app.use('/admin/users', adminUsersRoutes);
+app.use('/admin/events', adminEventsRoutes);
+app.use('/admin/clubs', adminClubsRoutes);
+app.use('/admin/products', adminProductsRoutes);
+app.use('/admin/content', adminContentRoutes);
 // Create HTTP server and attach Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -151,4 +169,10 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err);
+  res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });

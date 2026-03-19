@@ -21,6 +21,8 @@ import ViewCart from "../pages/user/ViewCart"
 import OnboardingComplete from "../pages/user/OnboardingComplete"
 import PaymentSuccess from "../pages/user/PaymentSuccess"
 import PaymentCancelled from "../pages/user/PaymentCancelled"
+import ManageUsers from "../pages/admin/ManageUsers"
+import ManageContent from "../pages/admin/ManageContent"
 import Discover from "../pages/user/club pages/Discover"
 import JoinedClubs from "../pages/user/club pages/JoinedClubs"
 import Posts from "../pages/user/Posts"
@@ -82,7 +84,9 @@ function App() {
           <Route path="/manageNotes" element={<ManageNotes />} />
           <Route path="/manageEvents" element={<ManageEvent />} />
           <Route path="/manageMarket" element={<ManageMarket />} />
-          <Route path="/manageClub" element={<ManageClub />} />
+          <Route path="/manageClubs" element={<ManageClub />} />
+          <Route path="/manageUsers" element={<ManageUsers />} />
+          <Route path="/manageContent" element={<ManageContent />} />
           <Route path="/viewCart" element={<ViewCart />} />
           <Route path="/onboarding-complete" element={<OnboardingComplete />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />

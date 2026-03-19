@@ -3,6 +3,8 @@ import { CiEdit, CiLogout } from "react-icons/ci";
 import { CgNotes } from "react-icons/cg";
 import { FaShoppingCart } from "react-icons/fa";
 import { ImClubs } from "react-icons/im";
+import { MdEventNote } from "react-icons/md";
+import { FaHome } from "react-icons/fa";
 import React from 'react';
 
 const AdminSideBar = () => {
@@ -33,64 +35,100 @@ const AdminSideBar = () => {
                     </div>
 
                     {/* Center: Navigation */}
-                    <nav className="flex flex-wrap gap-6 justify-center text-white">
+                    <nav className="flex flex-wrap gap-4 md:gap-6 justify-center text-white">
+                        <NavLink
+                            to="/AdminDashboard"
+                            className={({ isActive }) =>
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
+                            }
+                        >
+                            <span className="flex items-center gap-1">
+                                Dashboard
+                                <FaHome className="text-xl hidden lg:block" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/manageUsers"
+                            className={({ isActive }) =>
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
+                            }
+                        >
+                            <span className="flex items-center gap-1">
+                                Users
+                                <ImClubs className="text-xl hidden lg:block" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/manageEvents"
+                            className={({ isActive }) =>
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
+                            }
+                        >
+                            <span className="flex items-center gap-1">
+                                Events
+                                <ImClubs className="text-xl hidden lg:block" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/manageClubs"
+                            className={({ isActive }) =>
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
+                            }
+                        >
+                            <span className="flex items-center gap-1">
+                                Clubs
+                                <ImClubs className="text-xl hidden lg:block" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/manageMarket"
+                            className={({ isActive }) =>
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
+                            }
+                        >
+                            <span className="flex items-center gap-1">
+                                Market
+                                <FaShoppingCart className="text-xl hidden lg:block" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/manageNotes"
+                            className={({ isActive }) =>
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
+                            }
+                        >
+                            <span className="flex items-center gap-1">
+                                Notes
+                                <CgNotes className="text-xl hidden lg:block" />
+                            </span>
+                        </NavLink>
+
+                        <NavLink
+                            to="/manageContent"
+                            className={({ isActive }) =>
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
+                            }
+                        >
+                            <span className="flex items-center gap-1">
+                                Content
+                                <CgNotes className="text-xl hidden lg:block" />
+                            </span>
+                        </NavLink>
+
                         <NavLink
                             to="/AdminEdit"
                             className={({ isActive }) =>
-                                `${isActive ? 'italic text-lg' : 'hover:text-lg'}`
+                                `${isActive ? 'italic text-base md:text-lg' : 'hover:text-base md:hover:text-lg text-sm md:text-base'}`
                             }
                         >
                             <span className="flex items-center gap-1">
-                                Edit Profile
-                                <CiEdit className="text-xl" />
-                            </span>
-                        </NavLink>
-
-                        <NavLink
-                            to="/ManageNotes"
-                            className={({ isActive }) =>
-                                `${isActive ? 'italic text-lg' : 'hover:text-lg'}`
-                            }
-                        >
-                            <span className="flex items-center gap-1">
-                                Get Notes
-                                <CgNotes className="text-xl" />
-                            </span>
-                        </NavLink>
-
-                        <NavLink
-                            to="/ManageMarket"
-                            className={({ isActive }) =>
-                                `${isActive ? 'italic text-lg' : 'hover:text-lg'}`
-                            }
-                        >
-                            <span className="flex items-center gap-1">
-                                Market Place
-                                <FaShoppingCart className="text-xl" />
-                            </span>
-                        </NavLink>
-
-                        <NavLink
-                            to="/ManageClubs"
-                            className={({ isActive }) =>
-                                `${isActive ? 'italic text-lg' : 'hover:text-lg'}`
-                            }
-                        >
-                            <span className="flex items-center gap-1">
-                                View Clubs
-                                <ImClubs className="text-xl" />
-                            </span>
-                        </NavLink>
-
-                        <NavLink
-                            to="/ManageEvents"
-                            className={({ isActive }) =>
-                                `${isActive ? 'italic text-lg' : 'hover:text-lg'}`
-                            }
-                        >
-                            <span className="flex items-center gap-1">
-                                View Events
-                                <ImClubs className="text-xl" />
+                                Profile
+                                <CiEdit className="text-xl hidden lg:block" />
                             </span>
                         </NavLink>
                     </nav>

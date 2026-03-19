@@ -29,6 +29,10 @@ const userSchema = new mongoose.Schema({
         default: 'https://www.gravatar.com/avatar/'
 
     },
+    isBanned: {
+        type: Boolean,
+        default: false
+    },
     stripeAccountId: {
         type: String,
         default: null

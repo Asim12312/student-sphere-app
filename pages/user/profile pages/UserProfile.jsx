@@ -353,7 +353,7 @@ const UserProfile = () => {
                     {isOwnProfile && (
                         <button
                             onClick={() => coverInputRef.current.click()}
-                            className="absolute bottom-6 right-6 bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-xl hover:bg-white/30 transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center gap-2 font-semibold border border-white/30 z-50"
+                            className="absolute top-6 right-6 bg-white/40 backdrop-blur-md text-white px-6 py-3 rounded-2xl shadow-xl hover:bg-white/50 transition-all duration-300 opacity-0 group-hover:opacity-100 flex items-center gap-2 font-semibold border border-white/40 z-50"
                         >
                             <IoCamera size={20} /> Edit Cover
                         </button>
@@ -415,7 +415,7 @@ const UserProfile = () => {
                                 {isOwnProfile ? (
                                     <button
                                         onClick={() => setShowEditModal(true)}
-                                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-2xl font-bold flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 whitespace-nowrap shrink-0"
                                     >
                                         <IoSettingsOutline size={20} /> Edit Profile
                                     </button>
@@ -719,14 +719,23 @@ const UserProfile = () => {
                 <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] flex flex-col">
                         {/* Modal Header */}
-                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 flex justify-between items-center">
-                            <h2 className="text-3xl font-bold text-white">Edit Profile</h2>
-                            <button
-                                onClick={() => setShowEditModal(false)}
-                                className="text-white hover:bg-white/20 p-2 rounded-full transition"
-                            >
-                                <IoClose size={32} />
-                            </button>
+                        <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 flex flex-wrap justify-between items-center gap-4 shrink-0">
+                            <h2 className="text-2xl md:text-3xl font-bold text-white whitespace-nowrap">Edit Profile</h2>
+                            <div className="flex gap-4 items-center">
+                                <button
+                                    onClick={() => setShowEditModal(false)}
+                                    className="px-6 py-2.5 bg-white/20 hover:bg-white/30 text-white rounded-xl font-bold transition-all border border-white/20 whitespace-nowrap min-w-[100px]"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleSaveProfile}
+                                    disabled={saving}
+                                    className="px-6 py-2.5 bg-white text-purple-600 hover:bg-gray-100 rounded-xl font-bold disabled:opacity-50 transition-all shadow-lg whitespace-nowrap min-w-[100px]"
+                                >
+                                    {saving ? 'Saving...' : 'Update'}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Modal Tabs */}
@@ -864,22 +873,7 @@ const UserProfile = () => {
                             )}
                         </div>
 
-                        {/* Modal Footer */}
-                        <div className="bg-gray-50 p-6 flex justify-end gap-4 border-t border-gray-200 shrink-0">
-                            <button
-                                onClick={() => setShowEditModal(false)}
-                                className="px-8 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-xl font-bold transition shadow-md"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleSaveProfile}
-                                disabled={saving}
-                                className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold disabled:opacity-50 shadow-lg transition-all duration-300 transform hover:scale-105"
-                            >
-                                {saving ? 'Saving...' : 'Save All Changes'}
-                            </button>
-                        </div>
+
                     </div>
                 </div>
             )}

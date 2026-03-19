@@ -34,6 +34,10 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    if (user.isBanned) {
+      return res.status(403).json({ error: 'Your account has been banned by an administrator.' });
+    }
+
     const payload = {
       id: user._id,
       role: user.role
